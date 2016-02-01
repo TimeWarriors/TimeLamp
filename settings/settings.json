@@ -1,0 +1,12 @@
+[
+    {
+        "type": "hue",
+        "id": "Lägg till id på lampan",
+        "room": "Lägg till id på rum"
+    },
+
+    {
+        "type": "blink",
+        "id": "Lägg till id på Lampan"
+    }
+]
