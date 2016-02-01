@@ -1,0 +1,19 @@
+{
+  "name": "timelamp",
+  "version": "0.0.1",
+  "description": "This is the main reposetory for the product.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimeWarriors/TimeLamp.git"
+  },
+  "author": "TimeWarriors",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TimeWarriors/TimeLamp/issues"
+  },
+  "homepage": "https://github.com/TimeWarriors/TimeLamp#readme"
+}
