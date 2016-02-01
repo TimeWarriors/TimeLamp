@@ -1,5 +1,6 @@
 settings.json - Innehåller alla lampor som objekt och kan få in en ny lampa när som helst.
-                För att lägga till en ny lampa skapa ett objekt i arrayn.
+                För att lägga till en ny lampa skapa ett objekt i arrayn. Exempel på lampor är
+                blink och hue.
                 Exempel:
                         [
                             {
