@@ -20,11 +20,15 @@ const TimeeditDAL = class extends TimeeditApi {
                 if(!value || value === null) {
                     this._getTodaysRoomSchedule(roomId).then((roomSchedule) => {
                         this.cache.set(key, roomSchedule, 10800 * 1000); // 3tim
-                        resolve(roomSchedule);
+                        return resolve(roomSchedule);
+                    }).catch((er) => {
+                        reject(er);
                     });
                 }else{
-                    resolve(value);
+                    return resolve(value);
                 }
+            }).catch((er) => {
+                reject(er);
             });
         });
     }
@@ -42,11 +46,15 @@ const TimeeditDAL = class extends TimeeditApi {
                 if(!value || value === null) {
                     this._getRoomSchedule(roomId).then((roomSchedule) => {
                         this.cache.set(key, roomSchedule, 10800 * 1000); // 3tim
-                        resolve(roomSchedule);
+                        return resolve(roomSchedule);
+                    }).catch((er) => {
+                        reject(er);
                     });
                 }else{
-                    resolve(value);
+                    return resolve(value);
                 }
+            }).catch((er) => {
+                reject(er);
             });
         });
     }
