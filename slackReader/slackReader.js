@@ -6,14 +6,15 @@ let slackReader = function(){
 slackReader.prototype.getLecutrerStatus = function(){
 	
 	//var XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
-    var statusWindow = document.getElementById("status");
+    
 	
 	//var xhr1 = new XMLHttpRequest();
 	//authenticate
 	//Add
-	var params = "client_id=3143650568.20094508496&scope=channels:history";	
-	window.location = "https://slack.com/oauth/authorize?" + params; ///client_id:3143650568.20094508496_scope:read_redirect_uri:https://github.com/TimeWarriors
-	//xhr1.open("GET", "http://slack.com/oauth/authorize/client_id")
+	var settings = getSlackSettings();
+	var params = "client_id="+getSlackSettings().clientID+"&scope=" + getSlackSettings().scope;	
+	window.location = "https://slack.com/oauth/authorize?" + params; ///
+	//xhr1.open("GET", "http://slack.com/oauth/authorize/")
 
     var xhr = new XMLHttpRequest();
     //xhr.open("GET", "https://slack.com/api/groups.history");
