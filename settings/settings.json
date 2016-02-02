@@ -1,12 +1,24 @@
 [
     {
         "type": "hue",
-        "id": "Lägg till id på lampan",
-        "room": "Lägg till id på rum"
+        "lampId": "XXX",
+        "roomId": "105"
+    },
+
+    {
+        "type": "hue",
+        "lampId": "XX",
+        "roomId": "105"
+    },
+
+    {
+        "type": "hue",
+        "lampId": "XXX",
+        "roomId": "106"
     },
 
     {
         "type": "blink",
-        "id": "Lägg till id på Lampan"
+        "lampId": "YYY"
     }
 ]
