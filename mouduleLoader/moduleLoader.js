@@ -25,12 +25,11 @@ const ModuleLoader = class {
     }
 
     _getFileNamesFromDir(){
-        return fsp.readdir('../timeLamp_modules');
+        return fsp.readdir('./timeLamp_modules');
     }
 
     _requireModules(files){
-        console.log(files);
-        return files.map(filename => require(`../timeLamp_modules/${filename}`));
+        return files.map(filename => require('../timeLamp_modules/'+filename));
     }
 
     _runModules(modules, functionLayer){
@@ -39,7 +38,6 @@ const ModuleLoader = class {
         } catch (e) {
             throw e;
         }
-
     }
 };
 
