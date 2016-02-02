@@ -17,26 +17,26 @@ settings.json - Innehåller alla lampor som objekt och kan få in en ny lampa n�
                         ]
 
 
-settings.js - Scriptet innehåller en JSON parser funktion som läser av settings.json filen.
+settings.js  Scriptet innehåller en JSON parser funktion som läser av settings.json filen.
               Scriptet innehåller även tre funktioner som är GETS till Lampor.
 
-getLamps(type)         - Denna funktionen tar in en type som kan vara blink eller hue.
-                         Tar funktionen in något annat kommer den kasta felmedelande att
-                         den inte kunde hitta typen.
+getLamps(type)          Denna funktionen tar in en type som kan vara blink eller hue.
+                        Tar funktionen in något annat kommer den kasta felmedelande att
+                        den inte kunde hitta typen.
 
-                         Om man skickar in en valid typ så får man tilbaka alla lampor
-                         som är av den här typen.
+                        Om man skickar in en valid typ så får man tilbaka alla lampor
+                        som är av den här typen.
 
-getLampsinRoom(roomId) - Denna funktionen tarin et rumId som kan vara vad som helst.
-                         I testkoden används idt 105. Om ett id inte existerar så får
-                         man tillbaka ett error som säger att rummet inte existerar.
+getLampsinRoom(roomId)  Denna funktionen tarin et rumId som kan vara vad som helst.
+                        I testkoden används idt 105. Om ett id inte existerar så får
+                        man tillbaka ett error som säger att rummet inte existerar.
 
-                         Om man skickar in ett valit rumId så får man tillbaka alla lampor
-                         som existerar i detta rum.
+                        Om man skickar in ett valit rumId så får man tillbaka alla lampor
+                        som existerar i detta rum.
 
-getIdOnLamps(lampId)   - Denna funktionen tar in en type som kan avra vad som helst.
-                         I testkoden används idt XXX. Om ett id inte existerar så får
-                         man tillbaka ett error som säger att lampan inte existerar.
+getIdOnLamps(lampId)    Denna funktionen tar in en type som kan avra vad som helst.
+                        I testkoden används idt XXX. Om ett id inte existerar så får
+                        man tillbaka ett error som säger att lampan inte existerar.
 
-                         Om man skickar in ett valit rumId så får man tillbaka alla lampor
-                         som existerar på detta id.
+                        Om man skickar in ett valit rumId så får man tillbaka alla lampor
+                        som existerar på detta id.
