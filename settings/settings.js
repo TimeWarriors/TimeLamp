@@ -7,9 +7,6 @@
 
 let fs = require('fs-promise');
 let fileName = "settings.json";
-let name = "";
-let id = "";
-
 
 const Settings = class {
     constructor() {
