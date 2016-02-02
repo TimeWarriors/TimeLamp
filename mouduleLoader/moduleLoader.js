@@ -8,14 +8,14 @@ const ModuleLoader = class {
      * [starts timeLamp modules]
      * @return {[object]} [all the modules]
      */
-    startModules(){
-        return new Promise(function(resolve, reject) {
+    startModules(functionLayer){
+        return new Promise((resolve, reject) => {
             this._getFileNamesFromDir()
                 .then((filenames) => {
                     return this._requireModules(filenames);
                 })
                 .then((modules) => {
-                    this._runModules(modules);
+                    this._runModules(modules, functionLayer);
                     resolve(modules);
                 })
                 .catch((err) => {
@@ -29,12 +29,13 @@ const ModuleLoader = class {
     }
 
     _requireModules(files){
-        return files.map(filename => require('../timeLamp_modules'+filename));
+        console.log(files);
+        return files.map(filename => require(`../timeLamp_modules/${filename}`));
     }
 
-    _runModules(modules){
+    _runModules(modules, functionLayer){
         try {
-            modules.forEach(m => m.init());
+            modules.forEach(m => m.init(functionLayer));
         } catch (e) {
             throw e;
         }
