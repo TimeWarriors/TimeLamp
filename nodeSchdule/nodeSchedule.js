@@ -93,12 +93,4 @@ const NodeSchedule =  class {
 
 };
 
-//module.exports = new NodeSchedule();
-
-// how to use
-//const ns = new NodeSchedule();
-//ns.scheduleEmittJobb(new Date(), null, 'ny105', {});
-//ns.scheduleJob(new Date(), {}).then(() => {});
-//ns.scheduleRecurrenceEmittJob([0, 4], 14, 0, null, 'ny105', {});
-//ns.scheduleFunctionCallJob(new Date(), bajs, null);
-//ns.scheduleRecurringFunctionCallJob(bajs, {}, 30, 10, [0, 4]);
+module.exports = new NodeSchedule();
