@@ -3,7 +3,7 @@ const eventEmitter = require('events').EventEmitter;
 
 const EventEmitter = class {
     constructor(){
-        this.eventEmitter = new EventEmitter();
+        this.eventEmitter = new eventEmitter();
     }
 
     getEventEmitter(){
