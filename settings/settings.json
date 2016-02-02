@@ -1,0 +1,24 @@
+[
+    {
+        "type": "hue",
+        "lampId": "XXX",
+        "roomId": "105"
+    },
+
+    {
+        "type": "hue",
+        "lampId": "XX",
+        "roomId": "105"
+    },
+
+    {
+        "type": "hue",
+        "lampId": "XXX",
+        "roomId": "106"
+    },
+
+    {
+        "type": "blink",
+        "lampId": "YYY"
+    }
+]
