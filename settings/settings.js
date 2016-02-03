@@ -92,23 +92,23 @@ module.exports = new Settings();
 
     // Test kod som testar de olika funtionerna med hårdkodade värden.
     // Även alla id som är i settings.json är hårdkodade.
-
-    let setting = new Settings();
-
-    setting.getLamps("hue").then((types) =>{
-        console.log(JSON.stringify(types, null, 2));
-    }).catch((error) =>{
-        console.log(error);
-    });
-
-    setting.getLampsinRoom("ny105").then((rooms) =>{
-        console.log(JSON.stringify(rooms, null, 2));
-    }).catch((error) =>{
-        console.log(error);
-    })
-
-    setting.getIdOnLamps("XXX").then((lamps) =>{
-        console.log(JSON.stringify(lamps, null, 2));
-    }).catch((error) =>{
-        console.log(error);
-    })
+    // 
+    // let setting = new Settings();
+    //
+    // setting.getLamps("hue").then((types) =>{
+    //     console.log(JSON.stringify(types, null, 2));
+    // }).catch((error) =>{
+    //     console.log(error);
+    // });
+    //
+    // setting.getLampsinRoom("ny105").then((rooms) =>{
+    //     console.log(JSON.stringify(rooms, null, 2));
+    // }).catch((error) =>{
+    //     console.log(error);
+    // })
+    //
+    // setting.getIdOnLamps("XXX").then((lamps) =>{
+    //     console.log(JSON.stringify(lamps, null, 2));
+    // }).catch((error) =>{
+    //     console.log(error);
+    // })
