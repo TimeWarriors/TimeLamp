@@ -1,0 +1,6 @@
+{
+    "avalibleColor": [0, 136, 34],
+    "almostOccupiedColor": [255, 99, 0],
+    "occupiedColor": [255, 0, 0],
+    "timeForAlmost": 30
+}
