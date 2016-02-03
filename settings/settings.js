@@ -6,7 +6,7 @@
 // settings.json - I JSON filen finns alla lampor som existerar.
 
 let fs = require('fs-promise');
-let fileName = "settings.json";
+let fileName = __dirname+"/settings.json";
 
 const Settings = class {
     constructor() {
@@ -40,6 +40,8 @@ const Settings = class {
                     reject("Type was not fund.");
                 }
                 resolve(filterdType);
+            }).catch((error) =>{
+                reject(error);
             })
         });
     }
@@ -58,6 +60,8 @@ const Settings = class {
                      reject("The room was not found");
                  }
                 resolve(filterdRoom);
+            }).catch((error) =>{
+                reject(error);
             })
         });
     }
@@ -77,6 +81,8 @@ const Settings = class {
                      reject("The lamp was not found");
                  }
                 resolve(filterdLamp);
+            }).catch((error) =>{
+                reject(error);
             })
         });
     }
@@ -87,22 +93,22 @@ module.exports = new Settings();
     // Test kod som testar de olika funtionerna med hårdkodade värden.
     // Även alla id som är i settings.json är hårdkodade.
 
-    // let setting = new Settings();
-    //
-    // setting.getLamps("hue").then((types) =>{
-    //     console.log(JSON.stringify(types, null, 2));
-    // }).catch((error) =>{
-    //     console.log(error);
-    // });
-    //
-    // setting.getLampsinRoom("105").then((rooms) =>{
-    //     console.log(JSON.stringify(rooms, null, 2));
-    // }).catch((error) =>{
-    //     console.log(error);
-    // })
-    //
-    // setting.getIdOnLamps("XXX").then((lamps) =>{
-    //     console.log(JSON.stringify(lamps, null, 2));
-    // }).catch((error) =>{
-    //     console.log(error);
-    // })
+    let setting = new Settings();
+
+    setting.getLamps("hue").then((types) =>{
+        console.log(JSON.stringify(types, null, 2));
+    }).catch((error) =>{
+        console.log(error);
+    });
+
+    setting.getLampsinRoom("ny105").then((rooms) =>{
+        console.log(JSON.stringify(rooms, null, 2));
+    }).catch((error) =>{
+        console.log(error);
+    })
+
+    setting.getIdOnLamps("XXX").then((lamps) =>{
+        console.log(JSON.stringify(lamps, null, 2));
+    }).catch((error) =>{
+        console.log(error);
+    })
