@@ -50,3 +50,22 @@ man tillbaka ett error som säger att lampan inte existerar.
 
 Om man skickar in ett valit rumId så får man tillbaka alla lampor
 som existerar på detta id.
+
+
+modulesettings.json
+
+Detta är en json fil som innehåller all information till modulerna och är satt till färgerna red, orange och green.
+De kan ändras i filen när man vill beroende på vilka färger man vill att lampan ska ha.
+Filen har även en tid satt till 30 som berättar för lampan när den ska vara orange.
+
+
+modulesettings.js
+
+Detta script är gjort för att retunera en parsad fil med all information om lampan till modulen/modulerna.
+Den fungrar enkelt med en funktion som parsar json filen och en funtion som retunerar den.
+
+Funktionen parsar filen.
+parsedFile();
+
+Funktionen retunerar den parsade filens värden.
+getModuleSettings();
