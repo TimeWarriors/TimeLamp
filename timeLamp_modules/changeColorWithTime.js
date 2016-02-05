@@ -7,22 +7,26 @@ const MyModule = class {
 
         this.s = s;
         this.timeEdidApiLnu = new this.s.TimeeditDAL(
-            'https://se.timeedit.net/web/lnu/db1/schema1/',
-            4
+                'https://se.timeedit.net/web/lnu/db1/schema1/',
+                4
             );
     }
 
     /**
-     * [this fuction will run one per day]
+     * [this fuction will run one (or more) per day]
      * @return {[type]} [description]
      */
     init(){
         co(function*(){
-            let roomSchedule = yield this.getRoomSchedule();
-            let moduleSettings = yield this.getModuleSettings();
-            let roomColorSchedule = this.roomColorSchedule(roomSchedule, moduleSettings);
+            let lamps = yield this.s.settings.getLamps('hue');
+            let roomIds = this.getRoomIdsFomLamps(lamps);
+            let roomSchedule = yield this.getRoomSchedule(roomIds);
+            let moduleSettings = yield this.settingsModule.getModuleSettings();
+
+            return this.roomColorSchedule(roomSchedule, moduleSettings);
+        }.bind(this)).then((roomColorSchedule) => {
             this.makeNodeEmitterSchedule(roomColorSchedule);
-        }.bind(this)).catch((er) => {
+        }).catch((er) => {
             console.log(er);
         });
     }
@@ -32,8 +36,8 @@ const MyModule = class {
      * @param  {[type]} color [description]
      * @return {[type]}       [description]
      */
-    changeColor(color){
-        console.log('poop: ', color);
+    changeColor(object){
+        console.log('call some function here..: ', object);
     }
 
     /**
@@ -59,22 +63,21 @@ const MyModule = class {
      * [returns room schedule]
      * @return {[object]} [room schedule]
      */
-    getRoomSchedule(){
-        return this.s.settings.getLamps('hue').then((lamps) => {
-            return Promise.all(lamps.map((lamp) => {
-                return lamp.roomId;
-            }).map((roomId) => {
+    getRoomSchedule(roomIds){
+        return Promise.all(roomIds.map((roomId) => {
                 return this.timeEdidApiLnu.getTodaysRoomSchedule(roomId);
             }));
-        });
     }
 
     /**
-     * [retrives module settings]
-     * @return {[object]} [module settings]
+     * [retrives rooms id from lamb object]
+     * @param  {[object]} lamps [collection of lamps]
+     * @return {[object]}       [collection of roomdId]
      */
-    getModuleSettings(){
-        return this.settingsModule.getModuleSettings();
+    getRoomIdsFomLamps(lamps){
+        return lamps.map((lamp) => {
+                return lamp.roomId;
+            });
     }
 
     /**
