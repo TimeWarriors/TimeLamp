@@ -22,7 +22,6 @@ const MyModule = class {
             let moduleSettings = yield this.getModuleSettings();
             let roomColorSchedule = this.roomColorSchedule(roomSchedule, moduleSettings);
             this.makeNodeEmitterSchedule(roomColorSchedule);
-            console.log(JSON.stringify(roomColorSchedule, null, 2));
         }.bind(this)).catch((er) => {
             console.log(er);
         });
