@@ -1,6 +1,7 @@
 {
-    "avalibleColor": [0, 136, 34],
+    "avalibleColor": [0, 255, 0],
     "almostOccupiedColor": [255, 99, 0],
     "occupiedColor": [255, 0, 0],
-    "timeForAlmost": 30
+    "timeForAlmost": 30,
+    "defaltColor": [0, 255, 0]
 }
