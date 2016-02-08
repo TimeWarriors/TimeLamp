@@ -1,0 +1,32 @@
+{
+  "name": "lamp-prototypes",
+  "version": "1.0.0",
+  "description": "prototypes",
+  "main": "app.js",
+  "dependencies": {
+    "node-hid": "git+https://github.com/lorenc-tomasz/node-hid.git#package",
+    "node-blink1": "^0.2.2",
+    "promise": "^7.1.1",
+    "requirejs": "^2.1.22"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TimeWarriors/LightHandler.git"
+  },
+  "keywords": [
+    "lights",
+    "lamps",
+    "philips hue",
+    "blink"
+  ],
+  "author": "TimeWarriors",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/TimeWarriors/LightHandler.git/issues"
+  },
+  "homepage": "https://github.com/TimeWarriors/LightHandler.git#readme"
+}
