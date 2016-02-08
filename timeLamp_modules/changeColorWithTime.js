@@ -23,6 +23,7 @@ const MyModule = class {
             let roomSchedule = yield this.getRoomSchedule(roomIds);
             let moduleSettings = yield this.settingsModule.getModuleSettings();
 
+            this.setDefaultColor(lamps, moduleSettings);
             return this.roomColorSchedule(roomSchedule, moduleSettings);
         }.bind(this)).then((roomColorSchedule) => {
             this.makeNodeEmitterSchedule(roomColorSchedule);
@@ -39,12 +40,25 @@ const MyModule = class {
     changeColor(object){
         this._.settings.getLampsinRoom(object.roomId)
             .then((lampsInRoom) => {
-                lampsInRoom.forEach((lampId) => {
-                    // call hue color changing function her
+                lampsInRoom.forEach((lamps) => {
+                    this._.lightHandler.changeColor(lamps.lampId, object.color[0], object.color[1], object.color[2]);
                 });
             }).catch((er) => {
-
+                console.log(er);
             });
+    }
+
+    /**
+     * [sets the default color for lapms]
+     * @param {[array]} lamps          [array of lamp objects]
+     * @param {[object]} moduleSettings [settings object for this module]
+     */
+    setDefaultColor(lamps, moduleSettings){
+        lamps.map((lamp) => {
+            return lamp.lampId;
+        }).forEach((lampId) => {
+            this._.lightHandler.changeColor(lampId, moduleSettings.defaltColor[0], moduleSettings.defaltColor[1], moduleSettings.defaltColor[2]);
+        });
     }
 
     /**
@@ -53,14 +67,15 @@ const MyModule = class {
      * @return {[type]}       [description]
      */
     makeNodeEmitterSchedule(rooms){
-        const emitter = this._.eventEmitter.getEventEmitter();
-        rooms.forEach((room) => {
-            room.status.forEach((booking) => {
-                this._.nodeSchedule.scheduleFunctionCallJob(
-                    new Date(booking.time),
-                    this.changeColor.bind(this),
-                    {color: booking.color, roomId: room.roomId}
-                );
+        rooms.forEach((bookings) => {
+            bookings.forEach((booking) => {
+                booking.status.forEach((status) => {
+                    this._.nodeSchedule.scheduleFunctionCallJob(
+                        new Date(status.time),
+                        this.changeColor.bind(this),
+                        {color: status.color, roomId: booking.roomId}
+                    );
+                });
             });
         });
     }
@@ -86,6 +101,7 @@ const MyModule = class {
             });
     }
 
+    // TODO: make this function pritier
     /**
      * [builds room color schedule out of room schedule]
      * @param  {[object]} roomSchedule  [schedule of rooms]
@@ -96,18 +112,29 @@ const MyModule = class {
         return roomSchedule.map((roomBookingSchedule) => {
             return roomBookingSchedule.reduce((colorSchedule, booking) => {
                 let room = {};
+                room.status = [];
                 if(!booking.hasOwnProperty('booking')){
                     room.roomId = booking.roomId;
-                    room.status = [
+                    room.status.push(
                         {
                             time: this.addMinuteToDate(1),
                             color: colorSettings.avalibleColor
                         }
-                    ];
-                    return room;
+                    );
+                    colorSchedule.push(room);
+                    return colorSchedule;
+                }
+
+                if(this.isRoomBookedNow(booking.booking.time)){
+                    room.status.push(
+                        {
+                            time: this.addMinuteToDate(1),
+                            color: colorSettings.occupiedColor
+                        }
+                    );
                 }
                 room.roomId = booking.booking.roomId;
-                room.status = [
+                room.status.push(
                     {
                         time: this.buildDate(booking.booking.time.endTime),
                         color: colorSettings.avalibleColor
@@ -119,11 +146,24 @@ const MyModule = class {
                     {
                         time: this.buildDate(booking.booking.time.startTime),
                         color: colorSettings.occupiedColor
-                    }
-                ];
-                return room;
-            }, {});
+                    });
+                colorSchedule.push(room);
+                return colorSchedule;
+            }, []);
         });
+    }
+
+    /**
+     * [check if time is between two times]
+     * @param  {[object]}  bookingTime [object of times]
+     * @return {Boolean}             [if time is between two times or not]
+     */
+    isRoomBookedNow(bookingTime){
+        let startDate = this.buildDate(bookingTime.startTime);
+        let endDate = this.buildDate(bookingTime.endTime);
+        let today = new Date();
+        return startDate.getTime() < today.getTime() &&
+        endDate.getTime() > today.getTime();
     }
 
     /**
