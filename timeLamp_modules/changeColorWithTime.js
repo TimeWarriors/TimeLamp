@@ -5,8 +5,8 @@ const MyModule = class {
     constructor(s) {
         this.settingsModule = require('../settings/modulesettings.js');
 
-        this.s = s;
-        this.timeEdidApiLnu = new this.s.TimeeditDAL(
+        this._ = s;
+        this.timeEdidApiLnu = new this._.TimeeditDAL(
                 'https://se.timeedit.net/web/lnu/db1/schema1/',
                 4
             );
@@ -18,7 +18,7 @@ const MyModule = class {
      */
     init(){
         co(function*(){
-            let lamps = yield this.s.settings.getLamps('hue');
+            let lamps = yield this._.settings.getLamps('hue');
             let roomIds = this.getRoomIdsFomLamps(lamps);
             let roomSchedule = yield this.getRoomSchedule(roomIds);
             let moduleSettings = yield this.settingsModule.getModuleSettings();
@@ -37,7 +37,14 @@ const MyModule = class {
      * @return {[type]}       [description]
      */
     changeColor(object){
-        console.log('call some function here..: ', object);
+        this._.settings.getLampsinRoom(object.roomId)
+            .then((lampsInRoom) => {
+                lampsInRoom.forEach((lampId) => {
+                    // call hue color changing function her
+                });
+            }).catch((er) => {
+
+            });
     }
 
     /**
@@ -46,13 +53,12 @@ const MyModule = class {
      * @return {[type]}       [description]
      */
     makeNodeEmitterSchedule(rooms){
-        const emitter = this.s.eventEmitter.getEventEmitter();
-
+        const emitter = this._.eventEmitter.getEventEmitter();
         rooms.forEach((room) => {
             room.status.forEach((booking) => {
-                this.s.nodeSchedule.scheduleFunctionCallJob(
+                this._.nodeSchedule.scheduleFunctionCallJob(
                     new Date(booking.time),
-                    this.changeColor,
+                    this.changeColor.bind(this),
                     {color: booking.color, roomId: room.roomId}
                 );
             });
