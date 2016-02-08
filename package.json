@@ -15,5 +15,15 @@
   "bugs": {
     "url": "https://github.com/TimeWarriors/TimeLamp/issues"
   },
-  "homepage": "https://github.com/TimeWarriors/TimeLamp#readme"
+  "homepage": "https://github.com/TimeWarriors/TimeLamp#readme",
+  "dependencies": {
+    "co": "^4.6.0",
+    "events": "^1.1.0",
+    "file-cache-simple": "0.0.3",
+    "fs-promise": "^0.4.1",
+    "node-blink1": "^0.2.2",
+    "node-hid": "git+https://github.com/lorenc-tomasz/node-hid.git#package",
+    "node-schedule": "^1.0.0",
+    "timeeditapi": "^1.1.0"
+  }
 }
