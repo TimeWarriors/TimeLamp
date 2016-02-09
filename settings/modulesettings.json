@@ -2,6 +2,10 @@
     "avalibleColor": [0, 255, 0],
     "almostOccupiedColor": [255, 99, 0],
     "occupiedColor": [255, 0, 0],
-    "timeForAlmost": 30,
+    "timeForLastCheckpoint": 5,
+    "timeForThirdCheckpoint": 15,
+    "timeForSecondCheckpoint": 30,
+    "timeForFirstCheckpoint": 60,
+    "timeForFadeToStart": 120,
     "defaltColor": [0, 255, 0]
 }
