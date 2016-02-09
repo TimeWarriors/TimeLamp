@@ -3,10 +3,12 @@
 const moduleLoader = require('./mouduleLoader/moduleLoader.js');
 const nodeSchedule = require('./nodeSchdule/nodeSchedule.js');
 const eventEmitter = require('./eventEmitter/eventEmitter.js');
+const LightHandler = require('./lightHandler/lightHandler.js');
 const settings = require('./settings/settings.js');
 const TimeeditDAL = require('./timeeditDAL/timeeditDAL.js');
 
 const emitter = eventEmitter.getEventEmitter();
+const lightHandler = new LightHandler();
 
 const ModuleHandeler = class {
     constructor() {
@@ -52,7 +54,8 @@ const ModuleHandeler = class {
             nodeSchedule,
             eventEmitter,
             TimeeditDAL,
-            settings
+            settings,
+            lightHandler
         };
     }
 };
