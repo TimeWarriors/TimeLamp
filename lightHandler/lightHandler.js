@@ -131,7 +131,7 @@ LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
     }
 }
 
-LightHandler.prototype.Warning(lampId, blinkrate, seconds){
+LightHandler.prototype.setWarning = function(lampId, blinkrate, seconds){
     this.toggleWarning(lampId, true, blinkrate);
     setTimeout(this.toggleWarning(lampId, false), seconds*1000);
 }
