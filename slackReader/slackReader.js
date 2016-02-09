@@ -4,6 +4,7 @@ let http = require('http');
 let fsp = require('fs-promise');
 let XMLHttpRequest = require("xmlhttprequest").XMLHttpRequest;
 
+//fult string dependency
 let swedishIsAtLocation = "Jag kom till";
 let englishIsAtLocation = "I entered";
 
@@ -35,7 +36,6 @@ let getLecutrerStatus = function(channelID, callback){
 			method:'GET'
 		};
 		
-		console.log(options.host)
 		
 		let xhr = new XMLHttpRequest();
 		
@@ -56,7 +56,7 @@ let getLecutrerStatus = function(channelID, callback){
 
 		xhr.send();
 
-		/*let req = http.get(options, function(res){
+		/*let req = https.get(options, function(res){
 			console.log("Inne i get")
 			console.log(res.statusCode);
 			console.log(JSON.stringify(res.headers));
