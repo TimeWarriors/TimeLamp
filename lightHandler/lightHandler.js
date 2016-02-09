@@ -79,7 +79,7 @@ LightHandler.prototype.changeColor = function(lampId, r, g, b, secondsToChange){
         http.request(options).write(bodyMessage);
     }
 }
-LightHandler.prototype.turnOff = function(lampId, status){
+LightHandler.prototype.On = function(lampId, status){
     let blinkDevices = Blink1.devices();
     if(blinkDevices.indexOf(lampId) != -1)
     {
