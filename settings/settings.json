@@ -19,6 +19,7 @@
 
     {
         "type": "blink",
+        "lampId": "YYY"
         "userId": "1234"
     }
 ]
