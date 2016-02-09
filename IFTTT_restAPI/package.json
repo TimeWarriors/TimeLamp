@@ -1,0 +1,17 @@
+{
+  "name": "blink_rest_api",
+  "version": "1.0.0",
+  "description": "rest api for blink lamps to our project",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "author": "TimeWarriors",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.14.2",
+    "express": "^4.13.4",
+    "fs-promise": "^0.4.1"
+  }
+}

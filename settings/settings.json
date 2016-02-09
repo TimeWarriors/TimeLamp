@@ -19,6 +19,7 @@
 
     {
         "type": "blink",
-        "userId": "1234"
+        "userId": "1234",
+		"lampId": "20005E32"
     }
 ]
