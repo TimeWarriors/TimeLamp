@@ -84,7 +84,14 @@ LightHandler.prototype.On = function(lampId, status){
     if(blinkDevices.indexOf(lampId) != -1)
     {
         blink1 = new Blink1(lampId);
-        blink1.off()
+        if(!on)
+        {          
+           blink1.off() 
+        }
+        else
+        {
+            this.changeColor(lampId, 255, 255, 255);
+        }
         blink1.close();
     }
     else{
@@ -116,7 +123,7 @@ LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
     }
     else{
             return setInterval(function(){
-            self.changeBrightness(lampId, bri);
+            self.changeBrightness(lampId, bri, blinkrate/1000);
             if(bri == 0)
             {
                 bri = 255;
