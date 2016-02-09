@@ -27,10 +27,11 @@ LightHandler.prototype.getHueLamps = function(){ //returnerar ingenting just nu
       console.log("Got error: " + e.message);
     });
 }
-LightHandler.prototype.changeBrightness = function(lampId, brightness)
+LightHandler.prototype.changeBrightness = function(lampId, brightness, secondsToChange)
 {
     let bodyMessage = JSON.stringify({
-        "bri": brightness
+        "bri": brightness,
+        "transitiontime":secondsToChange*10 
     })
     let headers = {
         'Content-Type': 'application/json',
@@ -128,6 +129,11 @@ LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
             }
         }, blinkrate);
     }
+}
+
+LightHandler.prototype.Warning(lampId, blinkrate, seconds){
+    this.toggleWarning(lampId, true, blinkrate);
+    setTimeout(this.toggleWarning(lampId, false), seconds*1000);
 }
 
 module.exports = LightHandler;
