@@ -45,13 +45,13 @@ LightHandler.prototype.changeBrightness = function(lampId, brightness)
     http.request(options).write(bodyMessage);
 }
 
-LightHandler.prototype.changeColor = function(lampId, r, g, b, millisecondsToChange){
-    millisecondsToChange = millisecondsToChange || 1000;
+LightHandler.prototype.changeColor = function(lampId, r, g, b, secondsToChange){
+    secondsToChange = secondsToChange || 1;
     let blinkDevices = Blink1.devices();
     if(blinkDevices.indexOf(lampId) != -1)
     {
         blink1 = new Blink1(lampId);
-        blink1.fadeToRGB(millisecondsToChange, r, g, b);
+        blink1.fadeToRGB(secondsToChange*1000, r, g, b);
         blink1.close();
     }
     else //här ska den köra med en else if mot philips hue istället
@@ -63,7 +63,8 @@ LightHandler.prototype.changeColor = function(lampId, r, g, b, millisecondsToCha
         let x = X / (X + Y + Z);
         let y = Y / (X + Y + Z);
         let bodyMessage = JSON.stringify({
-            "xy": [x,y]
+            "xy": [x,y],
+            "transitiontime":secondsToChange*10
         })
         let headers = {
             'Content-Type': 'application/json',
