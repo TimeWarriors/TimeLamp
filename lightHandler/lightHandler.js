@@ -3,7 +3,6 @@ let Blink1 = require('node-blink1');
 let config = require('./config.json')
 let http = require('http');
 let blink1;
-let interval;
 
 function LightHandler()
 {
@@ -113,11 +112,10 @@ LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
     let bri = 0;
     if(!on)
     {
-        clearInterval(interval);
         self.changeBrightness(lampId, 255)
     }
     else{
-            interval = setInterval(function(){
+            return setInterval(function(){
             self.changeBrightness(lampId, bri);
             if(bri == 0)
             {
@@ -132,8 +130,12 @@ LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
 }
 
 LightHandler.prototype.setWarning = function(lampId, blinkrate, seconds){
-    this.toggleWarning(lampId, true, blinkrate);
-    setTimeout(this.toggleWarning(lampId, false), seconds*1000);
+    let self = this;
+    let interval = this.toggleWarning(lampId, true, blinkrate);
+    setTimeout(function(){
+        self.toggleWarning(lampId, false);
+        clearInterval(interval);
+    }, seconds*1000);
 }
 
 module.exports = LightHandler;
