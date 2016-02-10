@@ -1,6 +1,8 @@
 'use strict';
 const co = require('co');
 
+
+// TODO: throw everyting out, start from the begining.
 const MyModule = class {
     constructor(s) {
         this.settingsModule = require('../settings/modulesettings.js');
@@ -26,14 +28,15 @@ const MyModule = class {
             this.setDefaultColor(lamps, moduleSettings);
             return this.roomColorSchedule(roomSchedule, moduleSettings);
         }.bind(this)).then((roomColorSchedule) => {
-            this.makeNodeEmitterSchedule(roomColorSchedule);
+            console.log(JSON.stringify(roomColorSchedule, null, 2));
+            //this.makeNodeEmitterSchedule(roomColorSchedule);
         }).catch((er) => {
             console.log(er);
         });
     }
 
     /**
-     * [will call hue change color function]
+     * [will call hue change color function or hue warning function]
      * @param  {[type]} color [description]
      * @return {[type]}       [description]
      */
@@ -41,7 +44,12 @@ const MyModule = class {
         this._.settings.getLampsinRoom(object.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamps) => {
-                    this._.lightHandler.changeColor(lamps.lampId, object.color[0], object.color[1], object.color[2]);
+                    if(object.hasOwnProperty('warning') && object.warning === true){
+                        this._.lightHandler.Warning(lamps.lampId, null, object.fadeTime);
+                    } else{
+                        this._.lightHandler.changeColor(lamps.lampId, object.color[0],
+                            object.color[1], object.color[2], object.fadeTime);
+                    }
                 });
             }).catch((er) => {
                 console.log(er);
@@ -57,7 +65,8 @@ const MyModule = class {
         lamps.map((lamp) => {
             return lamp.lampId;
         }).forEach((lampId) => {
-            this._.lightHandler.changeColor(lampId, moduleSettings.defaltColor[0], moduleSettings.defaltColor[1], moduleSettings.defaltColor[2]);
+            this._.lightHandler.changeColor(lampId, moduleSettings.defaltColor[0],
+                moduleSettings.defaltColor[1], moduleSettings.defaltColor[2]);
         });
     }
 
@@ -73,7 +82,7 @@ const MyModule = class {
                     this._.nodeSchedule.scheduleFunctionCallJob(
                         new Date(status.time),
                         this.changeColor.bind(this),
-                        {color: status.color, roomId: booking.roomId}
+                        {color: status.color, roomId: booking.roomId, fadeTime: status.fadeTime }
                     );
                 });
             });
@@ -101,7 +110,7 @@ const MyModule = class {
             });
     }
 
-    // TODO: make this function pritier
+    // TODO: make this function pritier!!!!!
     /**
      * [builds room color schedule out of room schedule]
      * @param  {[object]} roomSchedule  [schedule of rooms]
@@ -118,7 +127,8 @@ const MyModule = class {
                     room.status.push(
                         {
                             time: this.addMinuteToDate(1),
-                            color: colorSettings.avalibleColor
+                            color: colorSettings.avalibleColor,
+                            fadeTime: null
                         }
                     );
                     colorSchedule.push(room);
@@ -129,28 +139,52 @@ const MyModule = class {
                     room.status.push(
                         {
                             time: this.addMinuteToDate(1),
-                            color: colorSettings.occupiedColor
+                            color: colorSettings.occupiedColor,
+                            fadeTime: null
                         }
                     );
                 }
                 room.roomId = booking.booking.roomId;
                 room.status.push(
-                    {
-                        time: this.buildDate(booking.booking.time.endTime),
-                        color: colorSettings.avalibleColor
+                    { // gå till yellow // 120
+                        time: this.buildDate(booking.booking.time.startTime, colorSettings.timeForFadeToStart),
+                        color: colorSettings.fadeStartColor,
+                        fadeTime: this.minutesToSeconds(colorSettings.timeForFadeToStart/2)
                     },
-                    {
-                        time: this.buildDate(booking.booking.time.startTime, colorSettings.timeForAlmost),
-                        color: colorSettings.almostOccupiedColor
+                    {  // gå till orange // 60
+                        time: this.buildDate(booking.booking.time.startTime, colorSettings.timeForFirstCheckpoint),
+                        color: colorSettings.firstCheckpointColor,
+                        fadeTime: this.minutesToSeconds(colorSettings.timeForFirstCheckpoint/2)
                     },
-                    {
+                    { // gå till red // 30
+                        time: this.buildDate(booking.booking.time.startTime, colorSettings.timeForSecondCheckpoint),
+                        color: colorSettings.secondCheckpointColor,
+                        fadeTime: this.minutesToSeconds(colorSettings.timeForSecondCheckpoint/2)
+                    },
+                    { // blinka red // 5
+                        time: this.buildDate(booking.booking.time.startTime, colorSettings.timeForLastCheckpoint),
+                        color: colorSettings.lastCheckpoint,
+                        fadeTime: this.minutesToSeconds(colorSettings.timeForLastCheckpoint),
+                        warning: true
+                    },
+                    { // vara red
                         time: this.buildDate(booking.booking.time.startTime),
-                        color: colorSettings.occupiedColor
+                        color: colorSettings.occupiedColor,
+                        fadeTime: null
+                    },
+                    { // vara green
+                        time: this.buildDate(booking.booking.time.endTime),
+                        color: colorSettings.avalibleColor,
+                        fadeTime: null
                     });
                 colorSchedule.push(room);
                 return colorSchedule;
             }, []);
         });
+    }
+
+    minutesToSeconds(minutes){
+        return minutes * 60;
     }
 
     /**
