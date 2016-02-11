@@ -6,12 +6,19 @@ var lightHandler = require('../lightHandler/lightHandler');
 var lh = new lightHandler();
 
 app.use(bodyParser.json());
-//app.use(bodyParser.urlencoded({extended: false}))
+app.use(express.static(__dirname + "/client_prototype"))
 
 //Filler page
 app.get('/', function(req, res){	
-	res.send("<!doctype html><html><head><meta charset='utf-8' /><title>Blink RESTApi</title></head><body>Lorem Ipsum</body></html>");
+	fsp.readFile(__dirname + "client_prototype/index.html", {encoding:'utf8'}).then((contents) =>{
+		res.send(contents.toString());
+	});
+	//res.send("<!doctype html><html><head><meta charset='utf-8' /><title>Blink RESTApi</title></head><body>Lorem Ipsum</body></html>");
 });
+
+app.get("/json", function(req, res){
+	res.send(JSON.stringify({"id": "1234"}));
+})
 
 //Sets the presence in the settings JSON file to the users current presence.
 app.post('/update/:id/:presence', function(req, res){
@@ -30,9 +37,9 @@ app.post('/update/:id/:presence', function(req, res){
 		for (var i = 0; i < parsedContent.length; i++){
 
 			if(parsedContent[i].type === "blink" && parsedContent[i].userId === data.id){
-				console.log("Status gets changed here.");
+				console.log("Status gets changed here. " + data.id + " and " + data.presence);
 				//BLINK IS NOT GOING TO BE USED.
-				//
+				//updatePresence();
 			}
 		}
 	});
