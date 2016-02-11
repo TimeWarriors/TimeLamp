@@ -14,25 +14,31 @@ app.get('/', function(req, res){
 });
 
 //Sets the presence in the settings JSON file to the users current presence.
-app.post('/', function(req, res){
+app.post('/update/:id/:presence', function(req, res){
 	
 	console.log("successful post");
 	
-	console.log(JSON.parse(req.body));
-	var data = JSON.parse(req.body);
+	var data = {
+		id: req.params.id,
+		presence: req.params.presence
+	};
 	
 	
 	fsp.readFile('../settings/settings.json', {encoding:'utf8'}).then((contents) =>{
 		var parsedContent = JSON.parse(contents);		
-		
+
 		for (var i = 0; i < parsedContent.length; i++){
-			
-			if(parsedContent[i].type === "blink" && parsedContent[i].userID === data.id){
-				
+
+			if(parsedContent[i].type === "blink" && parsedContent[i].userId === data.id){
+				console.log("Status gets changed here.");
 				//BLINK IS NOT GOING TO BE USED.
+				//
 			}
 		}
 	});
+	
+	
+	res.send("Done");
 });
 
 

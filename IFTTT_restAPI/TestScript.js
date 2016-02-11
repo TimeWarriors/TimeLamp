@@ -4,53 +4,21 @@ var http = require('http');
 
 var testRun = function(){
 	
-	
-	
-	console.log("testobj initated.");
-
-	
-	var testObj = {
-		id: "1234",
-		presence: true
-	}
-	
 	console.log("options initated.");
 	
 	var options = {
 		host: "localhost",
-		path: "/",
+		path: "/update/1234/true",
 		method: 'POST',
-		port: '3000',
-		headers:{
-			'Content-Type': 'application/x-www-form-urlencoded'
-				
-		}
+		port: '3000'
+		
 	};
 	
-	
-	
 	var req = http.request(options, function(res){
-		console.log("Request sent.")
+		console.log(res.statusCode);
 	})
 	
-	req.write(JSON.stringify(testObj));
-	req.end();
-	
-	
-	/*request({
-		url: 'http://localhost:3000/',
-		method: 'POST',
-		json: true,
-		headers: {
-			'content-type': 'application/json'
-		},
-		body: JSON.stringify(testObj)
-	}, function(error, res, body){
-		//console.log(body);
-		console.log("Test complete.");
-	})*/
-	
-	
+	req.end();		
 }
 
 testRun();
