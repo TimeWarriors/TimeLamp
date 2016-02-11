@@ -1,8 +1,6 @@
 'use strict';
-let Blink1 = require('node-blink1');
 let config = require('./config.json')
 let http = require('http');
-let blink1;
 
 function LightHandler()
 {
