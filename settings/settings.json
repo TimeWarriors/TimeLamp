@@ -2,23 +2,24 @@
     {
         "type": "hue",
         "lampId": "XXX",
-        "roomId": "105"
+        "roomId": "ny105"
     },
 
     {
         "type": "hue",
         "lampId": "XX",
-        "roomId": "105"
+        "roomId": "ny105"
     },
 
     {
         "type": "hue",
         "lampId": "XXX",
-        "roomId": "106"
+        "roomId": "ny106"
     },
 
     {
         "type": "blink",
         "lampId": "YYY"
+        "userId": "1234"
     }
 ]
