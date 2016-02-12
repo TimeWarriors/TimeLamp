@@ -117,4 +117,23 @@ LightHandler.prototype.setWarning = function(lampId, blinkrate, seconds){
     }, seconds*1000);
 }
 
+LightHandler.prototype.changeColorWithHue = function(lampId, hue, secondsToChange)
+{
+    let bodyMessage = JSON.stringify({
+        "hue": hue,
+        "transitiontime":secondsToChange*10
+    })
+    let headers = {
+        'Content-Type': 'application/json',
+        'Content-Length': bodyMessage.length
+    };
+    let options = {
+        host: config.hueIp,
+        path: "/api/"+config.userName+"/lights/"+lampId+"/state",
+        method: 'PUT',
+        headers: headers
+    };
+    http.request(options).write(bodyMessage);
+}
+
 module.exports = LightHandler;

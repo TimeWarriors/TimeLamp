@@ -1,11 +1,32 @@
-{
-    "avalibleColor": [0, 255, 0],
-    "almostOccupiedColor": [255, 99, 0],
-    "occupiedColor": [255, 0, 0],
-    "timeForLastCheckpoint": 5,
-    "timeForThirdCheckpoint": 15,
-    "timeForSecondCheckpoint": 30,
-    "timeForFirstCheckpoint": 60,
-    "timeForFadeToStart": 120,
-    "defaltColor": [0, 255, 0]
-}
+[
+    {
+        "avalibleColor": [0, 255, 0],
+        "almostOccupiedColor": [255, 99, 0],
+        "occupiedColor": [255, 0, 0],
+        "timeForLastCheckpoint": 5,
+        "timeForSecondCheckpoint": 30,
+        "timeForFirstCheckpoint": 60,
+        "timeForFadeToStart": 120,
+        "defaltColor": [0, 255, 0]
+    },
+
+    {
+        "timeForFadeToStart": 120,
+        "color": 100
+    },
+
+    {
+        "timeForFirstCheckpoint": 60,
+        "color": 100
+    },
+
+    {
+        "timeForSecondCheckpoint": 30,
+        "color": 100
+    },
+
+    {
+        "timeForLastCheckpoint": 5,
+        "color": 100
+    }
+]
