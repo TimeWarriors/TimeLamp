@@ -2,10 +2,15 @@
 let LightHandler = require('./lightHandler.js');
 let lightHandler = new LightHandler();
 
-////ändra till grön
 
-lightHandler.changeColorWithHue("4", 0, 1);
-lightHandler.changeColorWithHue("3", 0, 1);
+////grön
+//lightHandler.changeColorWithHue("4", 25500, 1);
+////röd
+//lightHandler.changeColorWithHue("3", 0, 1);
+////gul
+//lightHandler.changeColorWithHue("4", 20678, 1);
+////orange
+//lightHandler.changeColorWithHue("3", 6375, 1);
 
 //lightHandler.changeColorWithHue("4", 46920, 1);
 //lightHandler.changeColorWithHue("3", 56228, 1);
