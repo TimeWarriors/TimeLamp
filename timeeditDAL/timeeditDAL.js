@@ -3,8 +3,8 @@ const TimeeditApi = require('timeeditapi');
 const FileCacheSimple = require('file-cache-simple');
 
 const TimeeditDAL = class extends TimeeditApi {
-    constructor(url1, url2) {
-        super(url1, url2);
+    constructor(url1, type) {
+        super(url1, type);
         this.cache = new FileCacheSimple();
     }
 
@@ -12,18 +12,19 @@ const TimeeditDAL = class extends TimeeditApi {
      * [checks if stored data is valid, if not get frech data store it and return in]
      * @return {[object]}        [room schedule]
      */
-    getTodaysRoomSchedule(roomId){
+    getTodaysSchedule(id){
         return new Promise((resolve, reject) => {
-            let key  = roomId + 'today';
+            let key  = id + 'today';
             this.cache.get(key)
             .then((value) => {
                 if(!value || value === null) {
-                    this._getTodaysRoomSchedule(roomId).then((roomSchedule) => {
-                        this.cache.set(key, roomSchedule, 10800 * 1000); // 3tim
-                        return resolve(roomSchedule);
-                    }).catch((er) => {
-                        reject(er);
-                    });
+                    this._getTodaysSchedule(id)
+                        .then((schedule) => {
+                            this.cache.set(key, schedule, 10800 * 1000); // 3tim
+                            return resolve(schedule);
+                        }).catch((er) => {
+                            reject(er);
+                        });
                 }else{
                     return resolve(value);
                 }
@@ -37,19 +38,19 @@ const TimeeditDAL = class extends TimeeditApi {
      * [checks if stored data is valid, if not get frech data store it and return in]
      * @return {[object]}        [room schedule]
      */
-    getRoomSchedule(roomId){
+    getSchedule(id){
         return new Promise((resolve, reject) => {
-            let key = roomId + 'full';
-            console.log(key);
+            let key = id + 'full';
             this.cache.get(key)
             .then((value) => {
                 if(!value || value === null) {
-                    this._getRoomSchedule(roomId).then((roomSchedule) => {
-                        this.cache.set(key, roomSchedule, 10800 * 1000); // 3tim
-                        return resolve(roomSchedule);
-                    }).catch((er) => {
-                        reject(er);
-                    });
+                    this._getSchedule(id)
+                        .then((schedule) => {
+                            this.cache.set(key, schedule, 10800 * 1000); // 3tim
+                            return resolve(schedule);
+                        }).catch((er) => {
+                            reject(er);
+                        });
                 }else{
                     return resolve(value);
                 }
@@ -59,12 +60,12 @@ const TimeeditDAL = class extends TimeeditApi {
         });
     }
 
-    _getRoomSchedule(roomId){
-        return super.getRoomSchedule(roomId);
+    _getSchedule(id){
+        return super.getRoomSchedule(id);
     }
 
-    _getTodaysRoomSchedule(roomId){
-        return super.getTodaysRoomSchedule(roomId);
+    _getTodaysSchedule(id){
+        return super.getTodaysSchedule(id);
     }
 
 };
