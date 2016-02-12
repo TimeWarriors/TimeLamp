@@ -19,20 +19,21 @@ app.get('/', function(req, res){
 	//res.send("<!doctype html><html><head><meta charset='utf-8' /><title>Blink RESTApi</title></head><body>Lorem Ipsum</body></html>");
 });
 
+//returns public data from a user
 app.get("/userData", function(req, res){
 	var data = [];
+	
 	fsp.readFile(path + fileName, {encoding:'utf8'}).then((contents) =>{
 		var parsedContent = JSON.parse(contents);
+
 		for(var i = 0; i < parsedContent.length; i++){
-			data.push(parsedContent.public_data);
+			data.push(parsedContent[i].public_data);
 		}
 		
-	}).then(() =>{
-		res.send(data);
-	});
-	
-	
+		res.send(data);		
+	});	
 })
+
 
 //Sets the presence in the settings JSON file to the users current presence.
 app.post('/update/:id/:presence', function(req, res){
