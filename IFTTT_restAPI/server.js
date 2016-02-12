@@ -62,11 +62,12 @@ app.post('/update/:id/:presence', function(req, res){
 					parsedContent[i].public_data.presence = true;
 				}
 				
+				//public data for a user that had his/ her status just updated.
 				var content = parsedContent[i].public_data; //Jävla javascript ibland.
 						
 				console.log("before overwrite.");
 				fsp.writeFile(path + fileName, JSON.stringify(parsedContent)).then(() =>{
-					
+					//and the public data is emitted so the status can be updated in real time.
 					io.emit('statusUpdated', content);
 					res.send("Done.");
 				});
@@ -75,17 +76,9 @@ app.post('/update/:id/:presence', function(req, res){
 	});
 });
 
-//test code
+
 io.on('connection', function(socket){
-
-	
-	
 	console.log("a user conned.");
-})
-//--
-
-io.on('update', function(){
-	console.log("io")
 })
 
 http.listen(3000, function(){
