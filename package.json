@@ -24,6 +24,6 @@
     "node-blink1": "^0.2.2",
     "node-hid": "git+https://github.com/lorenc-tomasz/node-hid.git#package",
     "node-schedule": "^1.0.0",
-    "timeeditapi": "^1.1.0"
+    "timeeditapi": "^2.0.0"
   }
 }
