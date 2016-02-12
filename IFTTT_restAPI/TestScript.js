@@ -2,6 +2,7 @@ var http = require('http');
 
 //var request = require('request');
 
+//test script will change presence of userId 1234 to true
 var testRun = function(){
 	
 	console.log("options initated.");

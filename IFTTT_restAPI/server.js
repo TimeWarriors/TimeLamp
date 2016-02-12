@@ -38,8 +38,6 @@ app.get("/userData", function(req, res){
 //Sets the presence in the settings JSON file to the users current presence.
 app.post('/update/:id/:presence', function(req, res){
 	
-	console.log("successful post");
-	
 	var data = {
 		id: req.params.id,
 		presence: req.params.presence
@@ -52,15 +50,14 @@ app.post('/update/:id/:presence', function(req, res){
 		for (var i = 0; i < parsedContent.length; i++){
 
 			if(parsedContent[i].userId === data.id){
-				console.log("Status gets changed here. " + data.id + " and " + data.presence);
+				parsedContent[i].public_data.presence = data.presence;			
 				
-				
+				fsp.writeFile(path + fileName, JSON.stringify(parsedContent)).then(() =>{
+					res.send("Data overwritten.")
+				});
 			}
 		}
 	});
-	
-	
-	res.send("Done");
 });
 
 
