@@ -1,9 +1,8 @@
 "use strict";
-//hårdkodande för testa
-let colorAt120 = 25500; //grön
-let colorAt60 = 20678; //gul
-let colorAt30 = 6375; //orange
-let colorAt0 = 0; //röd
+//25500 grön
+//20678 gul
+//6375 orange
+//0 röd
 
 function ColorTimeConverter(){
     
