@@ -12,6 +12,6 @@ function ColorTimeConverter(){
 //f1-((f1-f2)/(t1-t2))*(t1-tn)
 ColorTimeConverter.prototype.getColor = function(startTime, endTime, currentTime, startColor, endColor){
     let hueColor = startColor - (startColor - endColor)/(startTime - endTime)*(startTime - currentTime);
-    console.log(hueColor);
+    return hueColor;
 }
 module.exports = ColorTimeConverter;
