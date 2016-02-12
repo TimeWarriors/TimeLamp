@@ -5,6 +5,9 @@ var fsp = require("fs-promise");
 var lightHandler = require('../lightHandler/lightHandler');
 var lh = new lightHandler();
 
+var path = "../settings/";
+var fileName = "usersettings.json"
+
 app.use(bodyParser.json());
 app.use(express.static(__dirname + "/client_prototype"))
 
@@ -16,8 +19,19 @@ app.get('/', function(req, res){
 	//res.send("<!doctype html><html><head><meta charset='utf-8' /><title>Blink RESTApi</title></head><body>Lorem Ipsum</body></html>");
 });
 
-app.get("/json", function(req, res){
-	res.send(JSON.stringify({"id": "1234"}));
+app.get("/userData", function(req, res){
+	var data = [];
+	fsp.readFile(path + fileName, {encoding:'utf8'}).then((contents) =>{
+		var parsedContent = JSON.parse(contents);
+		for(var i = 0; i < parsedContent.length; i++){
+			data.push(parsedContent.public_data);
+		}
+		
+	}).then(() =>{
+		res.send(data);
+	});
+	
+	
 })
 
 //Sets the presence in the settings JSON file to the users current presence.
@@ -31,15 +45,15 @@ app.post('/update/:id/:presence', function(req, res){
 	};
 	
 	
-	fsp.readFile('../settings/settings.json', {encoding:'utf8'}).then((contents) =>{
+	fsp.readFile(path+fileName, {encoding:'utf8'}).then((contents) =>{
 		var parsedContent = JSON.parse(contents);		
 
 		for (var i = 0; i < parsedContent.length; i++){
 
-			if(parsedContent[i].type === "blink" && parsedContent[i].userId === data.id){
+			if(parsedContent[i].userId === data.id){
 				console.log("Status gets changed here. " + data.id + " and " + data.presence);
-				//BLINK IS NOT GOING TO BE USED.
-				//updatePresence();
+				
+				
 			}
 		}
 	});
