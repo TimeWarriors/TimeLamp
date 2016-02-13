@@ -32,7 +32,19 @@ function updatePresence(){
             x.appendChild(y);
             y.appendChild(img);
             y.appendChild(textName)
+            
+            if(data[i].presence == true){
+                
+                y.style.backgroundColor = "seagreen";
+                
+            }
+            else{
+                y.style.backgroundColor = "#82002B";
+            }
+            
         };
+        
+        
         
         
         

@@ -12,7 +12,9 @@ body {
     height: 250px;
     width: 250px;
     border: 1px solid black;
-    margin-top: 30px;
+    /*margin-top: 30px;*/
+    margin: 15px;
+    float: left;
   
     
 }
