@@ -11,7 +11,18 @@ function updatePresence(){
 	xhr.open("GET", "http://localhost:3000/userData");
 	xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhr.addEventListener("load", function(res){
-		console.log(JSON.parse(xhr.responseText));
+		
+        
+        let data = JSON.parse(xhr.responseText);
+        
+        console.log(data);
+        
+        
+        
+        let x = document.getElementById("dov");
+        x.innerHTML = data[0].img;
+        
+        
 	});
 	
 	xhr.send();
@@ -19,4 +30,13 @@ function updatePresence(){
 	//console.log(JSON.parse("../settings/settings.json"))
 }
 
-window.onload = updatePresence();
+
+
+console.log("hej");
+ window.onload = updatePresence;
+
+
+
+// window.onload = function () {
+//     updatePresence();
+// }
