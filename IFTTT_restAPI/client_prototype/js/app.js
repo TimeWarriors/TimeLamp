@@ -20,17 +20,18 @@ function updatePresence(){
         let x = document.getElementById("dataDiv");
         
         for (var i = 0; i < data.length; i++){
-        let img = document.createElement("img");
-        img.className = "teachImg";
-        let textName = document.createElement("p");
-        var name = data[i].name.split("_").join(" ");
-        textName.textContent = name;
-        let y = document.createElement("dataDivRes");
-        
-        img.src = data[i].img;
-        x.appendChild(y);
-        y.appendChild(img);
-        x.appendChild(textName)
+            let img = document.createElement("img");
+            img.className = "teachImg";
+            let textName = document.createElement("p");
+            var name = data[i].name.split("_").join(" ");
+            textName.textContent = name;
+            let y = document.createElement("div");
+            y.className = "teachRes";
+            
+            img.src = data[i].img;
+            x.appendChild(y);
+            y.appendChild(img);
+            y.appendChild(textName)
         };
         
         
