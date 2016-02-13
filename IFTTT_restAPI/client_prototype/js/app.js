@@ -20,7 +20,13 @@ function updatePresence(){
         
         
         let x = document.getElementById("dov");
-        x.innerHTML = data[0].img;
+        
+        let img = document.createElement("img");
+        img.src = data[0].img;
+        
+        x.appendChild(img);
+        
+        
         
         
 	});
