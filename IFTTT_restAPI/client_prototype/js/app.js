@@ -58,7 +58,7 @@ function updatePresence(){
 
 
 
-console.log("hej");
+console.log("hej test av github");
  window.onload = updatePresence;
 
 
