@@ -1,47 +1,50 @@
 'use strict';
+
 const co = require('co');
+const colorSchedule = require('./myModule/colorSchedule.js');
 
 const MyModule = class {
     constructor(s) {
-        this.settingsModule = require('../settings/modulesettings.js');
-
         this._ = s;
+        this.settingsModule = require('../settings/modulesettings.js');
         this.timeEdidApiLnu = new this._.TimeeditDAL(
                 'https://se.timeedit.net/web/lnu/db1/schema1/',
                 4
             );
     }
 
-    /**
-     * [this fuction will run one (or more) per day]
-     * @return {[type]} [description]
-     */
     init(){
-        co(function*(){
-            let lamps = yield this._.settings.getLamps('hue');
-            let roomIds = this.getRoomIdsFomLamps(lamps);
-            let roomSchedule = yield this.getRoomSchedule(roomIds);
-            let moduleSettings = yield this.settingsModule.getModuleSettings();
+        co(function* (){
+            let settings = yield this.getSettings('hue');
 
-            this.setDefaultColor(lamps, moduleSettings);
-            return this.roomColorSchedule(roomSchedule, moduleSettings);
-        }.bind(this)).then((roomColorSchedule) => {
-            this.makeNodeEmitterSchedule(roomColorSchedule);
-        }).catch((er) => {
-            console.log(er);
-        });
+            let moduleSettings = this.getModuleSettings(settings);
+            let lampSettings = this.getLampSettings(settings);
+            let lampIds = this.getIdsFromLamps(lampSettings);
+
+            let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
+            //this.setDefaultColor(lampIds, moduleSettings);
+            return colorSchedule.getColorSchedule(roomSchedule, moduleSettings);
+        }.bind(this))
+            .then((colorSchedule) => {
+                this.makeNodeSchedule(colorSchedule);
+            })
+            .catch((e) => {
+                console.log(e);
+            });
     }
 
+    // TODO: missing seconds to change
     /**
      * [will call hue change color function]
-     * @param  {[type]} color [description]
-     * @return {[type]}       [description]
+     * @param  {[type]} object []
      */
     changeColor(object){
+        console.log(object);
+
         this._.settings.getLampsinRoom(object.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamps) => {
-                    this._.lightHandler.changeColor(lamps.lampId, object.color[0], object.color[1], object.color[2]);
+                    this._.lightHandler.changeColorWithHue(lamps.lampId, lamps.color);
                 });
             }).catch((er) => {
                 console.log(er);
@@ -49,166 +52,69 @@ const MyModule = class {
     }
 
     /**
-     * [sets the default color for lapms]
-     * @param {[array]} lamps          [array of lamp objects]
-     * @param {[object]} moduleSettings [settings object for this module]
+     * [will book node schedules to run function at specific time]
+     * @param  {[array]} roomSchedule [contains times to book node schedule on]
+     * @return {[object]}       [node schedule events]
      */
-    setDefaultColor(lamps, moduleSettings){
-        lamps.map((lamp) => {
-            return lamp.lampId;
-        }).forEach((lampId) => {
-            this._.lightHandler.changeColor(lampId, moduleSettings.defaltColor[0], moduleSettings.defaltColor[1], moduleSettings.defaltColor[2]);
+    makeNodeSchedule(roomSchedule){
+        return roomSchedule.map((booking) => {
+            booking.colorSchedule.map((status) => {
+                return this._.nodeSchedule.scheduleFunctionCallJob(
+                    new Date(status.time),
+                    this.changeColor.bind(this),
+                    {color: status.color, roomId: booking.roomId}
+                );
+            });
         });
     }
 
     /**
-     * [will book node schedules to run function at specific time]
-     * @param  {[type]} rooms [description]
-     * @return {[type]}       [description]
+     * [returns settings for module and lamp]
+     * @param  {[string]} lampType [type of lamp]
+     * @return {[promise]}          [promise of all settings]
      */
-    makeNodeEmitterSchedule(rooms){
-        rooms.forEach((bookings) => {
-            bookings.forEach((booking) => {
-                booking.status.forEach((status) => {
-                    this._.nodeSchedule.scheduleFunctionCallJob(
-                        new Date(status.time),
-                        this.changeColor.bind(this),
-                        {color: status.color, roomId: booking.roomId}
-                    );
-                });
-            });
-        });
+    getSettings(lampType){
+        return Promise.all([
+            this._.settings.getLamps(lampType),
+            this.settingsModule.getModuleSettings(),
+        ]);
+    }
+
+    /**
+     * [retrives id from lamb object]
+     * @param  {[object]} lamps [collection of lamps]
+     * @return {[object]}       [collection of Id's]
+     */
+    getIdsFromLamps(lamps){
+        return lamps.map(lamp => lamp.roomId);
+    }
+
+    getModuleSettings(settings){
+        return settings[1];
+    }
+
+    getLampSettings(settings){
+        return settings[0];
     }
 
     /**
      * [returns room schedule]
      * @return {[object]} [room schedule]
      */
-    getRoomSchedule(roomIds){
-        return Promise.all(roomIds.map((roomId) => {
-                return this.timeEdidApiLnu.getTodaysRoomSchedule(roomId);
-            }));
+    getTodaysRoomSchedule(ids){
+        return Promise.all(ids.map(id =>
+            this.timeEdidApiLnu.getTodaysSchedule(id)));
     }
-
     /**
-     * [retrives rooms id from lamb object]
-     * @param  {[object]} lamps [collection of lamps]
-     * @return {[object]}       [collection of roomdId]
+     * [sets the default color for lapms]
+     * @param {[array]} lamps          [array of lamp objects]
+     * @param {[object]} moduleSettings [settings object for this module]
      */
-    getRoomIdsFomLamps(lamps){
-        return lamps.map((lamp) => {
-                return lamp.roomId;
-            });
-    }
-
-    // TODO: make this function pritier
-    /**
-     * [builds room color schedule out of room schedule]
-     * @param  {[object]} roomSchedule  [schedule of rooms]
-     * @param  {[object]} colorSettings [moduleSettings]
-     * @return {[object]}               [room color schedule]
-     */
-    roomColorSchedule(roomSchedule, colorSettings){
-        return roomSchedule.map((roomBookingSchedule) => {
-            return roomBookingSchedule.reduce((colorSchedule, booking) => {
-                let room = {};
-                room.status = [];
-                if(!booking.hasOwnProperty('booking')){
-                    room.roomId = booking.roomId;
-                    room.status.push(
-                        {
-                            time: this.addMinuteToDate(1),
-                            color: colorSettings.avalibleColor
-                        }
-                    );
-                    colorSchedule.push(room);
-                    return colorSchedule;
-                }
-
-                if(this.isRoomBookedNow(booking.booking.time)){
-                    room.status.push(
-                        {
-                            time: this.addMinuteToDate(1),
-                            color: colorSettings.occupiedColor
-                        }
-                    );
-                }
-                room.roomId = booking.booking.roomId;
-                room.status.push(
-                    {
-                        time: this.buildDate(booking.booking.time.endTime),
-                        color: colorSettings.avalibleColor
-                    },
-                    {
-                        time: this.buildDate(booking.booking.time.startTime, colorSettings.timeForAlmost),
-                        color: colorSettings.almostOccupiedColor
-                    },
-                    {
-                        time: this.buildDate(booking.booking.time.startTime),
-                        color: colorSettings.occupiedColor
-                    });
-                colorSchedule.push(room);
-                return colorSchedule;
-            }, []);
-        });
-    }
-
-    /**
-     * [check if time is between two times]
-     * @param  {[object]}  bookingTime [object of times]
-     * @return {Boolean}             [if time is between two times or not]
-     */
-    isRoomBookedNow(bookingTime){
-        let startDate = this.buildDate(bookingTime.startTime);
-        let endDate = this.buildDate(bookingTime.endTime);
-        let today = new Date();
-        return startDate.getTime() < today.getTime() &&
-        endDate.getTime() > today.getTime();
-    }
-
-    /**
-     * [makes new date]
-     * @param  {[string]} time    [hour and minute in string]
-     * @param  {[int]} timeDif [time diff in minutes]
-     * @return {[date]}         [new date object]
-     */
-    buildDate(time, timeDif){
-        let hourMinute = this.splitTime(time);
-        let today = new Date();
-        let t = new Date(
-            today.getFullYear(),
-            today.getMonth(),
-            today.getDate(),
-            hourMinute[0],
-            hourMinute[1]
+    setDefaultColor(lampIds, moduleSettings){
+        lampIds.forEach(lampId =>
+            this._.lightHandler.changeColor(lampId, moduleSettings.defaltColor[0],
+                moduleSettings.defaltColor[1], moduleSettings.defaltColor[2])
         );
-        if(timeDif){
-            t.setMinutes(t.getMinutes()-timeDif);
-        }
-        return t;
-    }
-
-    /**
-     * [add minutes to new date]
-     * @param {[int]} addMinute [minutes]
-     * @param {[date]} d [date]
-     * @return {[date]}          [new date]
-     */
-    addMinuteToDate(addMinute, d){
-        d = d || new Date();
-        let t = new Date(
-            d.getFullYear(),
-            d.getMonth(),
-            d.getDate(),
-            d.getHours(),
-            d.getMinutes()
-        );
-        t.setMinutes(t.getMinutes()+addMinute);
-        return t;
-    }
-
-    splitTime(timeString){
-        return timeString.split(':');
     }
 };
 
