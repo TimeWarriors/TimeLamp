@@ -16,7 +16,7 @@ GUIDE:
 
 6. Use the follow settings for your enter and exit calls:
 
-<b>URL:</b> TBD/update/yourUserID/{{EnteredOrExited}}
+<b>URL:</b> *TBD*/update/yourUserID/{{EnteredOrExited}}
 
 yourUserID - this is an ID written in the usersettings.json
 
