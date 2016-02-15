@@ -15,11 +15,5 @@
         "type": "hue",
         "lampId": "XXX",
         "roomId": "ny106"
-    },
-
-    {
-        "type": "blink",
-        "lampId": "YYY"
-        "userId": "1234"
-    }
+	}
 ]

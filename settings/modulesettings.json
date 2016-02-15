@@ -1,11 +1,21 @@
-{
-    "avalibleColor": [0, 255, 0],
-    "almostOccupiedColor": [255, 99, 0],
-    "occupiedColor": [255, 0, 0],
-    "timeForLastCheckpoint": 5,
-    "timeForThirdCheckpoint": 15,
-    "timeForSecondCheckpoint": 30,
-    "timeForFirstCheckpoint": 60,
-    "timeForFadeToStart": 120,
-    "defaltColor": [0, 255, 0]
-}
+[
+    {
+        "time": 120,
+        "color": 25500
+    },
+
+    {
+        "time": 60,
+        "color": 20678
+    },
+
+    {
+        "time": 30,
+        "color": 6375
+    },
+
+    {
+        "time": 5,
+        "color": 65535
+    }
+]
