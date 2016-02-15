@@ -21,14 +21,14 @@ function updatePresence(){
         
         for (var i = 0; i < data.length; i++){
             let img = document.createElement("img");
-            img.className = "teachImg";
+            img.id = "teachImg";
             let textName = document.createElement("p");
             var name = data[i].name.split("_").join(" ");
             textName.textContent = name;
             let teachDiv = document.createElement("div");
-            teachDiv.className = "teachRes";
+            teachDiv.id = "teachRes";
             let textDiv = document.createElement("div");
-            textDiv.className = "teachText";
+            textDiv.id = "teachText";
             
             img.src = data[i].img;
             dataDiv.appendChild(teachDiv);
