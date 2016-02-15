@@ -1,6 +1,10 @@
 [
 	{
-		"type":"blink",
-	 	"userID":"1234"
+	 	"userID":"1234",
+		"public_data": {
+			"presence": true,
+			"name": "Johan_Leitet",
+			"img": "Img url"
+		}
 	}
 ]
