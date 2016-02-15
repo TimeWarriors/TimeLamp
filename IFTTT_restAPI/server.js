@@ -5,6 +5,9 @@ var fsp = require("fs-promise");
 var lightHandler = require('../lightHandler/lightHandler');
 var lh = new lightHandler();
 
+var http = require('http').Server(app);
+var io = require('socket.io')(http);
+
 var path = "../settings/";
 var fileName = "usersettings.json"
 
@@ -38,6 +41,7 @@ app.get("/userData", function(req, res){
 //Sets the presence in the settings JSON file to the users current presence.
 app.post('/update/:id/:presence', function(req, res){
 	
+	//NOTE: since presence is sent as param it is a string and not a booelean.
 	var data = {
 		id: req.params.id,
 		presence: req.params.presence
@@ -50,10 +54,22 @@ app.post('/update/:id/:presence', function(req, res){
 		for (var i = 0; i < parsedContent.length; i++){
 
 			if(parsedContent[i].userId === data.id){
-				parsedContent[i].public_data.presence = data.presence;			
 				
+				if(data.presence === "false"){
+					parsedContent[i].public_data.presence = false;
+				}
+				else if(data.presence === "true"){
+					parsedContent[i].public_data.presence = true;
+				}
+				
+				//public data for a user that had his/ her status just updated.
+				var content = parsedContent[i].public_data; //Jävla javascript ibland.
+						
+				console.log("before overwrite.");
 				fsp.writeFile(path + fileName, JSON.stringify(parsedContent)).then(() =>{
-					res.send("Data overwritten.")
+					//and the public data is emitted so the status can be updated in real time.
+					io.emit('statusUpdated', content);
+					res.send("Done.");
 				});
 			}
 		}
@@ -61,4 +77,10 @@ app.post('/update/:id/:presence', function(req, res){
 });
 
 
-app.listen(3000);
+io.on('connection', function(socket){
+	console.log("a user conned.");
+})
+
+http.listen(3000, function(){
+	console.log("listening on 3k");
+});
