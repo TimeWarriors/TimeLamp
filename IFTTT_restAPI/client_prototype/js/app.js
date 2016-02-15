@@ -11,7 +11,44 @@ function updatePresence(){
 	xhr.open("GET", "http://localhost:3000/userData");
 	xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhr.addEventListener("load", function(res){
-		console.log(JSON.parse(xhr.responseText));
+		
+        
+        let data = JSON.parse(xhr.responseText);
+        
+        console.log(data);
+        
+        let x = document.getElementById("dataDiv");
+        
+        for (var i = 0; i < data.length; i++){
+            let img = document.createElement("img");
+            img.className = "teachImg";
+            let textName = document.createElement("p");
+            var name = data[i].name.split("_").join(" ");
+            textName.textContent = name;
+            let y = document.createElement("div");
+            y.className = "teachRes";
+            
+            img.src = data[i].img;
+            x.appendChild(y);
+            y.appendChild(img);
+            y.appendChild(textName)
+            
+            if(data[i].presence == true){
+                
+                y.style.backgroundColor = "seagreen";
+                
+            }
+            else{
+                y.style.backgroundColor = "#82002B";
+            }
+            
+        };
+        
+        
+        
+        
+        
+        
 	});
 	
 	xhr.send();
@@ -19,4 +56,13 @@ function updatePresence(){
 	//console.log(JSON.parse("../settings/settings.json"))
 }
 
-window.onload = updatePresence();
+
+
+console.log("hej test av github");
+ window.onload = updatePresence;
+
+
+
+// window.onload = function () {
+//     updatePresence();
+// }
