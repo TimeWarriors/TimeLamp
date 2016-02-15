@@ -6,24 +6,27 @@ function LightHandler()
 {
 
 }
-LightHandler.prototype.getHueLamps = function(){ //returnerar ingenting just nu
-    let options = {
-        host: config.hueIp,
-        path: "/api/"+config.userName+"/lights",
-        method: 'GET'
-    };
-    http.get(options, function(res) {
-      let chunks = [];
-      res.on('data', function(chunk) {
-        chunks.push(chunk);
-      }).on('end', function() {
-        let body = Buffer.concat(chunks);
-        console.log('BODY: ' + body);
-      })
-    }).on('error', function(e) {
-      console.log("Got error: " + e.message);
-    });
+LightHandler.prototype.getHueLamps = function(){
+    return new Promise((resolve, reject) => {
+        let options = {
+            host: config.hueIp,
+            path: "/api/"+config.userName+"/lights",
+            method: 'GET'
+        };
+        http.get(options, function(res) {
+          let chunks = [];
+          res.on('data', function(chunk) {
+            chunks.push(chunk);
+          }).on('end', function() {
+            let body = Buffer.concat(chunks);
+            return resolve(body.toString());
+          })
+        }).on('error', function(e) {
+          reject(message);
+        });
+    })
 }
+
 LightHandler.prototype.changeBrightness = function(lampId, brightness, secondsToChange)
 {
     let bodyMessage = JSON.stringify({
