@@ -1,5 +1,5 @@
 body {
-    background-color: #0088B5;
+    background-color: DODGERBLUE;
 }
 
 /*.teachImg{
@@ -7,26 +7,44 @@ body {
     height: 200px;
 }*/
 
-.teachRes {
-    background-color: seagreen;
+#teachRes {
+    /*background-color: seagreen;*/
     height: 250px;
     width: 250px;
-    border: 1px solid black;
-    /*margin-top: 30px;*/
+    /*border: 1px solid black;*/
+    margin-top: 30px;
     margin: 15px;
     float: left;
-  
-    
+    border-bottom-left-radius: 25px;
+    border-top-right-radius: 25px;
+    border-top-left-radius: 25px;
+    /*box-shadow:
+    10px 0 100px #fff,
+    10px 0 100px #0ff;   */
 }
 
-.teachRes img{
+#teachRes img{
     height: 200px;
     display: block;
     margin-left: auto;
     margin-right: auto;
+  
 }
 
-.teachRes p{
+
+#teachText {
+    margin-left: auto;
+    margin-right: auto;
+    max-width: 100px;
+    min-width: 150px;
+    background-color: #fff;
+    /*border: 1px solid black;*/
+    display: block;
+}
+
+#teachText p{
     text-align: center;
     font-weight:  bold;
+    /*background-color: #fff;*/
 }
+

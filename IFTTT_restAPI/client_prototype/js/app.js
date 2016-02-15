@@ -17,29 +17,35 @@ function updatePresence(){
         
         console.log(data);
         
-        let x = document.getElementById("dataDiv");
+        let dataDiv = document.getElementById("dataDiv");
         
         for (var i = 0; i < data.length; i++){
             let img = document.createElement("img");
-            img.className = "teachImg";
+            img.id = "teachImg";
             let textName = document.createElement("p");
             var name = data[i].name.split("_").join(" ");
             textName.textContent = name;
-            let y = document.createElement("div");
-            y.className = "teachRes";
+            let teachDiv = document.createElement("div");
+            teachDiv.id = "teachRes";
+            let textDiv = document.createElement("div");
+            textDiv.id = "teachText";
             
             img.src = data[i].img;
-            x.appendChild(y);
-            y.appendChild(img);
-            y.appendChild(textName)
+            dataDiv.appendChild(teachDiv);
+            teachDiv.appendChild(img);
+            teachDiv.appendChild(textDiv);
+            textDiv.appendChild(textName)
             
             if(data[i].presence == true){
                 
-                y.style.backgroundColor = "seagreen";
+                teachDiv.style.backgroundColor = "YELLOWGREEN";
+                // teachDiv.style.boxShadow = "10px 0 120px seagreen";
+                // teachDiv.style.boxShadow = "10px 10px 250px seagreen"; 
                 
             }
             else{
-                y.style.backgroundColor = "#82002B";
+                teachDiv.style.backgroundColor = "FIREBRICK";
+                
             }
             
         };

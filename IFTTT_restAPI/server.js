@@ -2,8 +2,6 @@ var express = require('express');
 var bodyParser = require('body-parser');
 var app = express();
 var fsp = require("fs-promise");
-var lightHandler = require('../lightHandler/lightHandler');
-var lh = new lightHandler();
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -65,11 +63,10 @@ app.post('/update/:id/:presence', function(req, res){
 				//public data for a user that had his/ her status just updated.
 				var content = parsedContent[i].public_data; //Jävla javascript ibland.
 						
-				console.log("before overwrite.");
 				fsp.writeFile(path + fileName, JSON.stringify(parsedContent)).then(() =>{
 					//and the public data is emitted so the status can be updated in real time.
 					io.emit('statusUpdated', content);
-					res.send("Done.");
+					res.send("true");
 				});
 			}
 		}
@@ -77,9 +74,6 @@ app.post('/update/:id/:presence', function(req, res){
 });
 
 
-io.on('connection', function(socket){
-	console.log("a user conned.");
-})
 
 http.listen(3000, function(){
 	console.log("listening on 3k");

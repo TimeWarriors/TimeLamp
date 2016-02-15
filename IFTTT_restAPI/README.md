@@ -16,17 +16,14 @@ GUIDE:
 
 6. Use the follow settings for your enter and exit calls:
 
-URL: *to be decided*
+<b>URL:</b> *TBD*/update/yourUserID/{{EnteredOrExited}}
 
-Method: POST
+yourUserID - this is an ID written in the usersettings.json
 
-Content Type: application/json
+{{EnteredOrExited}} - this is an ingridient you can include on IFTTT on the right side of the url input field, this will be true if you entered the area and false if you left the area.
 
+<b>Method:</b> POST
 
-Body:
+<b>Content Type:</b> Not required
 
-	{"id": "youUserID", //This can be provided by the admin for the application
-	
-	"presence": {{EnteredOrExited}}  //this is an ingredient you can create by clicking the bottle icon at the right corner, this 					 
-						//will give true if you are entering the area, false if you exit it.
-	}
+<b>Body:</b> Not required
