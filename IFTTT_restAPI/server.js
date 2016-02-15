@@ -12,15 +12,14 @@ var fileName = "usersettings.json"
 app.use(bodyParser.json());
 app.use(express.static(__dirname + "/client_prototype"))
 
-//Filler page
+//returns the index page for the client
 app.get('/', function(req, res){	
 	fsp.readFile(__dirname + "client_prototype/index.html", {encoding:'utf8'}).then((contents) =>{
 		res.send(contents.toString());
 	});
-	//res.send("<!doctype html><html><head><meta charset='utf-8' /><title>Blink RESTApi</title></head><body>Lorem Ipsum</body></html>");
 });
 
-//returns public data from a user
+//returns public data from all registerd user in usersettings.json
 app.get("/userData", function(req, res){
 	var data = [];
 	
@@ -47,7 +46,7 @@ app.post('/update/:id/:presence', function(req, res){
 	
 	
 	fsp.readFile(path+fileName, {encoding:'utf8'}).then((contents) =>{
-		var parsedContent = JSON.parse(contents);		
+		var parsedContent = JSON.parse(contents);	
 
 		for (var i = 0; i < parsedContent.length; i++){
 
@@ -76,5 +75,5 @@ app.post('/update/:id/:presence', function(req, res){
 
 
 http.listen(3000, function(){
-	console.log("listening on 3k");
+	console.log("listening on port 3000");
 });
