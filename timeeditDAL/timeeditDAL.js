@@ -44,7 +44,7 @@ const TimeeditDAL = class extends TimeeditApi {
             this.cache.get(key)
             .then((value) => {
                 if(!value || value === null) {
-                    this._getSchedule(id)
+                    this._getTimeeditSchedule(id)
                         .then((schedule) => {
                             this.cache.set(key, schedule, 10800 * 1000); // 3tim
                             return resolve(schedule);
@@ -60,8 +60,8 @@ const TimeeditDAL = class extends TimeeditApi {
         });
     }
 
-    _getSchedule(id){
-        return super.getRoomSchedule(id);
+    _getTimeeditSchedule(id){
+        return super.getSchedule(id);
     }
 
     _getTodaysSchedule(id){
