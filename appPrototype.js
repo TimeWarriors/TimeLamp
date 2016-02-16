@@ -18,7 +18,7 @@ let p = {
     settings,
     lightHandler
 };
-let a = require('./timeLamp_modules/myModule.js').run(p);
+let a = require('./timeLamp_modules/changeColorWithTime.js').run(p);
 a.init();
 
 

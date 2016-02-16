@@ -1,5 +1,4 @@
 'use strict';
-
 const co = require('co');
 const colorSchedule = require('./myModule/colorSchedule.js');
 
@@ -22,11 +21,13 @@ const MyModule = class {
             let lampIds = this.getIdsFromLamps(lampSettings);
 
             let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
+
             //this.setDefaultColor(lampIds, moduleSettings);
             return colorSchedule.getColorSchedule(roomSchedule, moduleSettings);
         }.bind(this))
             .then((colorSchedule) => {
-                this.makeNodeSchedule(colorSchedule);
+                console.log(JSON.stringify(colorSchedule, null, 2));
+                //this.makeNodeSchedule(colorSchedule);
             })
             .catch((e) => {
                 console.log(e);
@@ -102,9 +103,111 @@ const MyModule = class {
      * @return {[object]} [room schedule]
      */
     getTodaysRoomSchedule(ids){
-        return Promise.all(ids.map(id =>
-            this.timeEdidApiLnu.getTodaysSchedule(id)));
+        return [
+              [
+                {
+                  "booking": {
+                    "time": {
+                      "endDate": "2016-02-16",
+                      "endTime": "12:30",
+                      "startDate": "2016-02-16",
+                      "startTime": "08:00"
+                    },
+                    "id": "ny105",
+                    "bookingId": "305367",
+                    "columns": [
+                      "1DV023, NGWEC15h, NGWEC15h1",
+                      "VT16-R0120-0121, HT15-61017, HT15-61018",
+                      "Ny105K",
+                      "Johan Leitet, John Häggerud, Mats Loock",
+                      "",
+                      "Föreläsning",
+                      "",
+                      "",
+                      "https://connect.sunet.se/lecture-1dv023/"
+                    ]
+                  }
+              },
+              {
+                "booking": {
+                  "time": {
+                    "endDate": "2016-02-16",
+                    "endTime": "16:30",
+                    "startDate": "2016-02-16",
+                    "startTime": "16:00"
+                  },
+                  "id": "ny105",
+                  "bookingId": "305367",
+                  "columns": [
+                    "1DV023, NGWEC15h, NGWEC15h1",
+                    "VT16-R0120-0121, HT15-61017, HT15-61018",
+                    "Ny105K",
+                    "Johan Leitet, John Häggerud, Mats Loock",
+                    "",
+                    "Föreläsning",
+                    "",
+                    "",
+                    "https://connect.sunet.se/lecture-1dv023/"
+                  ]
+                }
+            },
+
+            {
+              "booking": {
+                "time": {
+                  "endDate": "2016-02-16",
+                  "endTime": "19:30",
+                  "startDate": "2016-02-16",
+                  "startTime": "17:00"
+                },
+                "id": "ny105",
+                "bookingId": "305367",
+                "columns": [
+                  "1DV023, NGWEC15h, NGWEC15h1",
+                  "VT16-R0120-0121, HT15-61017, HT15-61018",
+                  "Ny105K",
+                  "Johan Leitet, John Häggerud, Mats Loock",
+                  "",
+                  "Föreläsning",
+                  "",
+                  "",
+                  "https://connect.sunet.se/lecture-1dv023/"
+                ]
+              }
+          },
+
+          {
+            "booking": {
+              "time": {
+                "endDate": "2016-02-16",
+                "endTime": "21:30",
+                "startDate": "2016-02-16",
+                "startTime": "20:00"
+              },
+              "id": "ny105",
+              "bookingId": "305367",
+              "columns": [
+                "1DV023, NGWEC15h, NGWEC15h1",
+                "VT16-R0120-0121, HT15-61017, HT15-61018",
+                "Ny105K",
+                "Johan Leitet, John Häggerud, Mats Loock",
+                "",
+                "Föreläsning",
+                "",
+                "",
+                "https://connect.sunet.se/lecture-1dv023/"
+              ]
+            }
+        }
+
+          ]
+        ];
+
+
+        /*return Promise.all(ids.map(id =>
+            this.timeEdidApiLnu.getTodaysSchedule(id)));*/
     }
+
     /**
      * [sets the default color for lapms]
      * @param {[array]} lamps          [array of lamp objects]
