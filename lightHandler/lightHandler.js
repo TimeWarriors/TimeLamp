@@ -46,6 +46,24 @@ LightHandler.prototype.changeBrightness = function(lampId, brightness, secondsTo
     http.request(options).write(bodyMessage);
 }
 
+LightHandler.prototype.changeSaturation = function(lampId, saturation)
+{
+    let bodyMessage = JSON.stringify({
+        "sat": saturation 
+    })
+    let headers = {
+        'Content-Type': 'application/json',
+        'Content-Length': bodyMessage.length
+    };
+    let options = {
+        host: config.hueIp,
+        path: "/api/"+config.userName+"/lights/"+lampId+"/state",
+        method: 'PUT',
+        headers: headers
+    };
+    http.request(options).write(bodyMessage);
+}
+
 LightHandler.prototype.changeColor = function(lampId, r, g, b, secondsToChange){
     secondsToChange = secondsToChange || 1;
     //convert rgb to xy
