@@ -4,23 +4,26 @@ var app = express();
 var fsp = require("fs-promise");
 
 var http = require('http').Server(app);
+var test = require('http');
 var io = require('socket.io')(http);
 
+var scheduleHandler = require('./scheduleHandler.js');
+var sH = new scheduleHandler();
+
 var path = "../settings/";
-var fileName = "usersettings.json"
+var fileName = "usersettings.json";
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + "/client_prototype"))
 
-//Filler page
+//returns the index page for the client
 app.get('/', function(req, res){	
 	fsp.readFile(__dirname + "client_prototype/index.html", {encoding:'utf8'}).then((contents) =>{
 		res.send(contents.toString());
 	});
-	//res.send("<!doctype html><html><head><meta charset='utf-8' /><title>Blink RESTApi</title></head><body>Lorem Ipsum</body></html>");
 });
 
-//returns public data from a user
+//returns public data from all registerd user in usersettings.json
 app.get("/userData", function(req, res){
 	var data = [];
 	
@@ -47,7 +50,7 @@ app.post('/update/:id/:presence', function(req, res){
 	
 	
 	fsp.readFile(path+fileName, {encoding:'utf8'}).then((contents) =>{
-		var parsedContent = JSON.parse(contents);		
+		var parsedContent = JSON.parse(contents);	
 
 		for (var i = 0; i < parsedContent.length; i++){
 
@@ -66,7 +69,7 @@ app.post('/update/:id/:presence', function(req, res){
 				fsp.writeFile(path + fileName, JSON.stringify(parsedContent)).then(() =>{
 					//and the public data is emitted so the status can be updated in real time.
 					io.emit('statusUpdated', content);
-					res.send("true");
+					console.log("Status updated.");
 				});
 			}
 		}
@@ -76,5 +79,16 @@ app.post('/update/:id/:presence', function(req, res){
 
 
 http.listen(3000, function(){
+<<<<<<< HEAD
+	console.log("listening on port 3000");
+});
+=======
 	console.log("listening on 3k");
 });
+
+test.createServer(function(req, res){
+    res.writeHead(200, {'content-type': 'text/plain'});
+    res.write("test av server");
+    res.end('It works');
+}).listen(3000, '194.47.106.229');
+>>>>>>> master
