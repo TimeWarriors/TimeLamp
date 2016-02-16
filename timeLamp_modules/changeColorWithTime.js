@@ -109,7 +109,7 @@ const MyModule = class {
                   "booking": {
                     "time": {
                       "endDate": "2016-02-16",
-                      "endTime": "12:30",
+                      "endTime": "12:45",
                       "startDate": "2016-02-16",
                       "startTime": "08:00"
                     },
@@ -132,7 +132,7 @@ const MyModule = class {
                 "booking": {
                   "time": {
                     "endDate": "2016-02-16",
-                    "endTime": "16:30",
+                    "endTime": "16:45",
                     "startDate": "2016-02-16",
                     "startTime": "16:00"
                   },
@@ -180,7 +180,7 @@ const MyModule = class {
             "booking": {
               "time": {
                 "endDate": "2016-02-16",
-                "endTime": "21:30",
+                "endTime": "21:45",
                 "startDate": "2016-02-16",
                 "startTime": "20:00"
               },

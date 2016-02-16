@@ -78,7 +78,7 @@ const ColorSchedule = class  {
         let first = {time: 0, color: null};
         let last = {time: 0, color: null};
         var tempArray = avalibleTimes.slice(0);
-        tempArray.forEach((item) => {
+        avalibleTimes.forEach((item) => {
             if(a > item.time){
                 if(last.time < item.time){
                     last = item;
@@ -89,8 +89,15 @@ const ColorSchedule = class  {
                 }
             }
         });
-        let aColor = this.colorTimeConverter.getColor(
-                first.time, last.time, a, first.color, last.color);
+        let f = avalibleTimes.filter((item) => {
+            return item.time === a;
+        });
+
+        if(f.length <= 0 && first.time !== 0){
+            let aColor = this.colorTimeConverter.getColor(
+                    first.time, last.time, a, first.color, last.color);
+            tempArray.push({ time: a, color: Math.floor(aColor) });
+        }
 
         return this.sortSettingsOnTime(tempArray);
     }
