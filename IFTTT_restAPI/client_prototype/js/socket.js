@@ -13,5 +13,4 @@ var socket = io();
                 // teachRes.style.backgroundColor = "#B22222";
                 teachRes.className = "teachResNotPresent";
             }
-    
 })
