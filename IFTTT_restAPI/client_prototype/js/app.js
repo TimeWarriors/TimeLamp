@@ -8,27 +8,28 @@ function updatePresence(){
 	var xhr = new XMLHttpRequest();
 	//xhr.overrideMimeType("application/json");
 	
-	xhr.open("GET", "http://localhost:3000/userData");
+	//xhr.open("GET", "https://tw2-mathiassundin-3.c9users.io/userData"); On server
+    xhr.open("GET", "http://localhost:3000/userData"); //On localhost
 	xhr.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
 	xhr.addEventListener("load", function(res){
-		
-        
+
         let data = JSON.parse(xhr.responseText);
-        
         console.log(data);
         
         let dataDiv = document.getElementById("dataDiv");
         
         for (var i = 0; i < data.length; i++){
             let img = document.createElement("img");
-            img.className = "teachImg";
+            img.className = "teachImgPresent";
             let textName = document.createElement("p");
-            var name = data[i].name.split("_").join(" ");
-            textName.textContent = name;
+            let name = data[i].name;
+            textName.textContent = name.split("_").join(" ");
             let teachDiv = document.createElement("div");
-            teachDiv.className = "teachRes";
+            teachDiv.id = name;
+            teachDiv.className = "teachResPresent";
             let textDiv = document.createElement("div");
-            textDiv.className = "teachText";
+            textDiv.className = "teachTextPresent";
+            
             
             img.src = data[i].img;
             dataDiv.appendChild(teachDiv);
@@ -38,27 +39,21 @@ function updatePresence(){
             
             if(data[i].presence == true){
                 
-                teachDiv.style.backgroundColor = "YELLOWGREEN";
-                // teachDiv.style.boxShadow = "10px 0 120px seagreen";
-                // teachDiv.style.boxShadow = "10px 10px 250px seagreen"; 
-                
+                // teachRes.style.backgroundColor = "#ADFF2F";
+            teachDiv.className = "teachResPresent";
             }
             else{
-                teachDiv.style.backgroundColor = "FIREBRICK";
+                // teachRes.style.backgroundColor = "#B22222";
+                teachDiv.className = "teachResNotPresent";
                 
             }
             
         };
-        
-        
-        
-        
-        
-        
+      
 	});
 	
 	xhr.send();
-	
+
 	//console.log(JSON.parse("../settings/settings.json"))
 }
 
@@ -66,8 +61,6 @@ function updatePresence(){
 
 console.log("hej test av github");
  window.onload = updatePresence;
-
-
 
 // window.onload = function () {
 //     updatePresence();
