@@ -4,6 +4,7 @@ var app = express();
 var fsp = require("fs-promise");
 
 var http = require('http').Server(app);
+var test = require('http');
 var io = require('socket.io')(http);
 
 var path = "../settings/";
@@ -78,3 +79,9 @@ app.post('/update/:id/:presence', function(req, res){
 http.listen(3000, function(){
 	console.log("listening on 3k");
 });
+
+test.createServer(function(req, res){
+    res.writeHead(200, {'content-type': 'text/plain'});
+    res.write("test av server");
+    res.end('It works');
+}).listen(3000, '194.47.106.229');
