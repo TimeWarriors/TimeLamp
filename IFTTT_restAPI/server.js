@@ -6,8 +6,11 @@ var fsp = require("fs-promise");
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 
+var scheduleHandler = require('./scheduleHandler.js');
+var sH = new scheduleHandler();
+
 var path = "../settings/";
-var fileName = "usersettings.json"
+var fileName = "usersettings.json";
 
 app.use(bodyParser.json());
 app.use(express.static(__dirname + "/client_prototype"))
@@ -65,7 +68,7 @@ app.post('/update/:id/:presence', function(req, res){
 				fsp.writeFile(path + fileName, JSON.stringify(parsedContent)).then(() =>{
 					//and the public data is emitted so the status can be updated in real time.
 					io.emit('statusUpdated', content);
-					res.send("true");
+					console.log("Status updated.");
 				});
 			}
 		}
