@@ -5,51 +5,57 @@ const colorSchedule = require('./myModule/colorSchedule.js');
 const MyModule = class {
     constructor(s) {
         this._ = s;
+        this.nodeSchedules = [];
         this.settingsModule = require('../settings/modulesettings.js');
         this.timeEdidApiLnu = new this._.TimeeditDAL(
                 'https://se.timeedit.net/web/lnu/db1/schema1/',
                 4
             );
+
     }
 
     init(){
         co(function* (){
-            let settings = yield this.getSettings('hue');
+            this.removeNodeScheduleEvents(this.nodeSchedules);
 
+            let settings = yield this.getSettings('hue');
             let moduleSettings = this.getModuleSettings(settings);
             let lampSettings = this.getLampSettings(settings);
             let lampIds = this.getIdsFromLamps(lampSettings);
-
             let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
 
-            //this.setDefaultColor(lampIds, moduleSettings);
+            this.setDefaultColor(lampIds, moduleSettings);
             return colorSchedule.getColorSchedule(roomSchedule, moduleSettings);
         }.bind(this))
             .then((colorSchedule) => {
-                console.log(JSON.stringify(colorSchedule, null, 2));
-                //this.makeNodeSchedule(colorSchedule);
+                this.nodeSchedules = this.makeNodeSchedule(colorSchedule);
             })
             .catch((e) => {
-                console.log(e);
+                throw e;
             });
     }
 
-    // TODO: missing seconds to change
     /**
      * [will call hue change color function]
      * @param  {[type]} object []
      */
-    changeColor(object){
-        console.log(object);
-
-        this._.settings.getLampsinRoom(object.roomId)
+    changeColor(properties){
+        this._.settings.getLampsinRoom(properties.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamps) => {
-                    this._.lightHandler.changeColorWithHue(lamps.lampId, lamps.color);
+                    if(properties.fade === false){
+                        if(properties.emit !== false){ this.emittTimes(properties); }
+                        return this._.lightHandler.changeColorWithHue(lamps.lampId, properties.color, 0);
+                    }
+                    return this._.lightHandler.changeColorWithHue(lamps.lampId, properties.color, (properties.timeDif*60));
                 });
             }).catch((er) => {
                 console.log(er);
             });
+    }
+
+    emittTimes(properties){
+        this._.emitter.emit(properties.emit, properties);
     }
 
     /**
@@ -57,16 +63,36 @@ const MyModule = class {
      * @param  {[array]} roomSchedule [contains times to book node schedule on]
      * @return {[object]}       [node schedule events]
      */
-    makeNodeSchedule(roomSchedule){
-        return roomSchedule.map((booking) => {
-            booking.colorSchedule.map((status) => {
+    makeNodeSchedule(roomColorSchedule){
+        return roomColorSchedule.map((booking) => {
+            return booking.colorSchedule.map((status) => {
                 return this._.nodeSchedule.scheduleFunctionCallJob(
                     new Date(status.time),
                     this.changeColor.bind(this),
-                    {color: status.color, roomId: booking.roomId}
+                    { color: status.color, roomId: booking.roomId,
+                        timeDif: status.timeDif, fade: status.fade, emit: status.emit }
                 );
             });
         });
+    }
+
+    removeNodeScheduleEvents(nodeScheduleEvents){
+        if(!Array.isArray(nodeScheduleEvents)){
+            throw 'nodeSchedule not array';
+        }
+        nodeScheduleEvents.forEach((jobCollections) => {
+            if(!Array.isArray(jobCollections)){
+                throw 'jobCollections not array';
+            }
+            jobCollections.forEach((job) => {
+                try {
+                    job.cancel();
+                } catch (e) {
+
+                }
+            });
+        });
+
     }
 
     /**
@@ -103,109 +129,8 @@ const MyModule = class {
      * @return {[object]} [room schedule]
      */
     getTodaysRoomSchedule(ids){
-        return [
-              [
-                {
-                  "booking": {
-                    "time": {
-                      "endDate": "2016-02-16",
-                      "endTime": "12:45",
-                      "startDate": "2016-02-16",
-                      "startTime": "08:00"
-                    },
-                    "id": "ny105",
-                    "bookingId": "305367",
-                    "columns": [
-                      "1DV023, NGWEC15h, NGWEC15h1",
-                      "VT16-R0120-0121, HT15-61017, HT15-61018",
-                      "Ny105K",
-                      "Johan Leitet, John Häggerud, Mats Loock",
-                      "",
-                      "Föreläsning",
-                      "",
-                      "",
-                      "https://connect.sunet.se/lecture-1dv023/"
-                    ]
-                  }
-              },
-              {
-                "booking": {
-                  "time": {
-                    "endDate": "2016-02-16",
-                    "endTime": "16:45",
-                    "startDate": "2016-02-16",
-                    "startTime": "16:00"
-                  },
-                  "id": "ny105",
-                  "bookingId": "305367",
-                  "columns": [
-                    "1DV023, NGWEC15h, NGWEC15h1",
-                    "VT16-R0120-0121, HT15-61017, HT15-61018",
-                    "Ny105K",
-                    "Johan Leitet, John Häggerud, Mats Loock",
-                    "",
-                    "Föreläsning",
-                    "",
-                    "",
-                    "https://connect.sunet.se/lecture-1dv023/"
-                  ]
-                }
-            },
-
-            {
-              "booking": {
-                "time": {
-                  "endDate": "2016-02-16",
-                  "endTime": "19:30",
-                  "startDate": "2016-02-16",
-                  "startTime": "17:00"
-                },
-                "id": "ny105",
-                "bookingId": "305367",
-                "columns": [
-                  "1DV023, NGWEC15h, NGWEC15h1",
-                  "VT16-R0120-0121, HT15-61017, HT15-61018",
-                  "Ny105K",
-                  "Johan Leitet, John Häggerud, Mats Loock",
-                  "",
-                  "Föreläsning",
-                  "",
-                  "",
-                  "https://connect.sunet.se/lecture-1dv023/"
-                ]
-              }
-          },
-
-          {
-            "booking": {
-              "time": {
-                "endDate": "2016-02-16",
-                "endTime": "21:45",
-                "startDate": "2016-02-16",
-                "startTime": "20:00"
-              },
-              "id": "ny105",
-              "bookingId": "305367",
-              "columns": [
-                "1DV023, NGWEC15h, NGWEC15h1",
-                "VT16-R0120-0121, HT15-61017, HT15-61018",
-                "Ny105K",
-                "Johan Leitet, John Häggerud, Mats Loock",
-                "",
-                "Föreläsning",
-                "",
-                "",
-                "https://connect.sunet.se/lecture-1dv023/"
-              ]
-            }
-        }
-
-          ]
-        ];
-
-
-        /*return Promise.all(ids.map(id =>
-            this.timeEdidApiLnu.getTodaysSchedule(id)));*/
+        return Promise.all(ids.map(id =>
+            this.timeEdidApiLnu.getTodaysSchedule(id)));
     }
 
     /**

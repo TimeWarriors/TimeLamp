@@ -13,7 +13,7 @@ const lightHandler = new LightHandler();
 let p = {
     moduleLoader,
     nodeSchedule,
-    eventEmitter,
+    emitter,
     TimeeditDAL,
     settings,
     lightHandler
@@ -21,6 +21,14 @@ let p = {
 let a = require('./timeLamp_modules/changeColorWithTime.js').run(p);
 a.init();
 
+
+emitter.on('time_15', (event) => {
+    console.log('15 min');
+});
+
+emitter.on('time_5', (event) => {
+    console.log('5 min');
+});
 
 // const ModuleHandeler = class {
 //     constructor() {
