@@ -1,0 +1,7 @@
+{
+  "name": "SlackReader",
+  "version": "1.0.0",
+  "description": "Get Slack chatmessages and handle hashtags.",
+  "main": "app.js",
+  "author": "Wictor Kihlbaum"
+}
