@@ -1,5 +1,4 @@
-{
-  "hashTags": [
+[
     {
       "hashTag": "#!",
       "functionToCall": "?",
@@ -15,5 +14,4 @@
       "functionToCall": "?",
       "priority": 1
     }
-  ]
-}
+]
