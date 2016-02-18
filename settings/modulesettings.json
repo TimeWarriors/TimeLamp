@@ -19,7 +19,13 @@
 
     {
         "time": 5,
-        "color": 65535,
+        "color": 0,
+        "fade": false
+    },
+
+    {
+        "time": 0,
+        "color": 0,
         "fade": false
     }
 ]
