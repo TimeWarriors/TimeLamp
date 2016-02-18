@@ -26,6 +26,26 @@ LightHandler.prototype.getHueLamps = function(){
         });
     })
 }
+LightHandler.prototype.getHueLampById = function(id){
+    return new Promise((resolve, reject) => {
+        let options = {
+            host: config.hueIp,
+            path: "/api/"+config.userName+"/lights/"+id,
+            method: 'GET'
+        };
+        http.get(options, function(res) {
+          let chunks = [];
+          res.on('data', function(chunk) {
+            chunks.push(chunk);
+          }).on('end', function() {
+            let body = Buffer.concat(chunks);
+            return resolve(body.toString());
+          })
+        }).on('error', function(e) {
+          reject(message);
+        });
+    })
+}
 
 LightHandler.prototype.changeBrightness = function(lampId, brightness, secondsToChange)
 {
@@ -46,10 +66,11 @@ LightHandler.prototype.changeBrightness = function(lampId, brightness, secondsTo
     http.request(options).write(bodyMessage);
 }
 
-LightHandler.prototype.changeSaturation = function(lampId, saturation)
+LightHandler.prototype.changeSaturation = function(lampId, saturation, secondsToChange)
 {
     let bodyMessage = JSON.stringify({
-        "sat": saturation 
+        "sat": saturation,
+        "transitiontime":secondsToChange*10 
     })
     let headers = {
         'Content-Type': 'application/json',
@@ -129,13 +150,23 @@ LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
     }
 }
 
-LightHandler.prototype.setWarning = function(lampId, blinkrate, seconds){
+LightHandler.prototype.setWarning = function(lampId, blinkrate, seconds, hue){
     let self = this;
-    let interval = this.toggleWarning(lampId, true, blinkrate);
-    setTimeout(function(){
-        self.toggleWarning(lampId, false);
-        clearInterval(interval);
-    }, seconds*1000);
+    let newColor = hue;
+    let id = lampId;
+    let rate = blinkrate;
+    this.getHueLampById(lampId).then(function(res){    
+        let object = JSON.parse(res);
+        let initialColor = object.state.hue;
+        self.changeColorWithHue(id, newColor, 0);       
+        let interval = self.toggleWarning(id, true, rate);
+        setTimeout(function(){
+            self.changeColorWithHue(id, initialColor, 0);
+            self.toggleWarning(id, false);
+            clearInterval(interval);
+        }, seconds*1000);
+    })
+
 }
 
 LightHandler.prototype.changeColorWithHue = function(lampId, hue, secondsToChange)
