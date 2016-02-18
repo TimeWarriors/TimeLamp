@@ -1,21 +1,25 @@
 [
     {
         "time": 120,
-        "color": 25500
+        "color": 25500,
+        "fade": true
     },
 
     {
         "time": 60,
-        "color": 20678
+        "color": 20678,
+        "fade": true
     },
 
     {
-        "time": 30,
-        "color": 6375
+        "time": 15,
+        "color":6375,
+        "fade": false
     },
 
     {
         "time": 5,
-        "color": 65535
+        "color": 65535,
+        "fade": false
     }
 ]
