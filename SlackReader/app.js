@@ -4,6 +4,8 @@ const SlackReader = require('./SlackAPI/SlackReader.js');
 
 
 var slack = new SlackReader();
+slack.convertStartTimeToMilliseconds();
+
 
 slack.getAllChannels()
     .then(channelsObject => {
@@ -18,13 +20,13 @@ slack.getAllChannels()
     })
     .then(channelID => {
         // Test purpose. Get starttime from TimeEdit.
-        var lectureStartTime = '1455106500'; // 10/2-2016 Kl: 13:15.
+        //var lectureStartTime = '1455106500'; // 10/2-2016 Kl: 13:15.
+        var lectureStartTime = slack.convertStartTimeToMilliseconds('1315');
         return slack.getChatMessagesFromStartTime(channelID, lectureStartTime);
     })
     .then(messages => {
         // Test purpose.
         var postedMessages = 0;
-
         if (slack.isNewMessagePosted(messages, postedMessages)) {
             var newMessages = slack.getNewMessages(messages, postedMessages);
             return slack.searchForHashTags(newMessages);

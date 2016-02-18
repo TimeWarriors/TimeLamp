@@ -40,7 +40,7 @@ SlackReader.prototype.getChannelNamesAndIDs = function(channelsObject, channelNa
 
     for (var i = 0; i < channelNames.length; i++) {
         for (var j = 0; j < channels.length; j++) {
-            if (channels[j].name.match(channelNames[i])) {
+            if (channels[j].name.indexOf(channelNames[i]) > -1) {
                 var channel = {
                     "name": channelNames[i],
                     "id": channels[j].id
@@ -49,7 +49,6 @@ SlackReader.prototype.getChannelNamesAndIDs = function(channelsObject, channelNa
             }
         }
     }
-    //console.log(channelNamesAndIDs);
     return channelNamesAndIDs;
 };
 
@@ -57,11 +56,10 @@ SlackReader.prototype.getChannelNamesAndIDs = function(channelsObject, channelNa
 SlackReader.prototype.getChannelID = function(channels, channelName) {
     var channelID = '';
     for (var i = 0; i < channels.length; i++) {
-        if (channelName.match(channels[i].name)) {
+        if (channelName.indexOf(channels[i].name) > -1) {
             channelID = channels[i].id;
         }
     }
-
     if (channelID) return channelID;
 };
 
@@ -88,7 +86,6 @@ SlackReader.prototype.getChatMessagesFromStartTime = function(channelID, lecture
                     messages.push(body.messages[i].text);
                 }
                 return resolve(messages);
-                //return resolve(JSON.parse(body));
             });
         }).on('error', e => {
             console.error('ERROR: ' + e);
@@ -113,8 +110,8 @@ SlackReader.prototype.getNewMessages = function(messages, postedMessages) {
 
 SlackReader.prototype.searchForHashTags = function(newMessages) {
     // Test purpose.
-    //newMessages.push('#! Streamen funkar inte');
-    //newMessages.push('#? Jag har en fråga och streamen funkar inte! #!');
+    newMessages.push('#! Streamen funkar inte');
+    newMessages.push('#? Jag har en fråga, och #! streamen funkar inte!');
 
     var messages = [];
 
@@ -133,17 +130,20 @@ SlackReader.prototype.searchForHashTags = function(newMessages) {
                     message.hashTags.push(validHashTag);
                 }
             }
-
             messages.push(message);
         }
     }
+    if (messages.length > 0) return messages;
+};
 
-    if (messages.length > 0) {
-        console.log('At least one new message contains one or more hashtags!');
-        return messages;
-    } else {
-        console.log('None of the new messages contains any hashtags!');
-    }
+SlackReader.prototype.convertStartTimeToMilliseconds = function(startTime) {
+    var today = new Date();
+    today.setHours(startTime.substring(0, 2));
+    today.setMinutes(startTime.substring(2, 4));
+    today.setSeconds(0);
+    startTime = +today; // '+' Converts to milliseconds.
+
+    return startTime;
 };
 
 module.exports = SlackReader;
