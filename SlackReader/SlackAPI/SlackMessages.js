@@ -2,6 +2,7 @@
 
 let config = require('../config.json');
 let https = require('https');
+let hashTags = require('../hashtags.json');
 
 
 function SlackMessages() {};

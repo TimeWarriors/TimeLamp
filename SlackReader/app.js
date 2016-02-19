@@ -30,7 +30,7 @@ slackChannels.getAllChannels()
         // Test purpose.
         var postedMessages = 0;
         if (slackMessages.isNewMessagePosted(messages, postedMessages)) {
-            var newMessages = slack.getNewMessages(messages, postedMessages);
+            var newMessages = slackMessages.getNewMessages(messages, postedMessages);
             return slackMessages.searchForHashTags(newMessages);
         } else {
             console.log('No new messages has been posted!');
