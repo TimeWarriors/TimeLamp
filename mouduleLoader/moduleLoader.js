@@ -1,44 +1,32 @@
 'use strict';
 const fsp = require('fs-promise');
-
 const ModuleLoader = class {
-    constructor() {}
+    constructor(functionLayer) {
+        this._ = functionLayer;
+        this.timeLampModules = [];
+        this.requireModules();
+    }
+
+    requireModules(){
+        this.timeLampModules.push(
+            require('../timeLamp_modules/changeColorWithTime.js').run(this._)
+        );
+    }
 
     /**
      * [starts timeLamp modules]
      * @return {[object]} [all the modules]
      */
-    startModules(functionLayer){
-        return new Promise((resolve, reject) => {
-            this._getFileNamesFromDir()
-                .then((filenames) => {
-                    return this._requireModules(filenames);
-                })
-                .then((modules) => {
-                    this._runModules(modules, functionLayer);
-                    resolve(modules);
-                })
-                .catch((err) => {
-                    reject(err);
-                });
+    runModules(functionLayer){
+        this.timeLampModules.forEach((timeLampModule) => {
+            try {
+                timeLampModule.init();
+            } catch (e) {
+                fsp.writeFile('debuglog.txt', e);
+            }
         });
     }
 
-    _getFileNamesFromDir(){
-        return fsp.readdir('./timeLamp_modules');
-    }
-
-    _requireModules(files){
-        return files.map(filename => require('../timeLamp_modules/'+filename));
-    }
-
-    _runModules(modules, functionLayer){
-        try {
-            modules.forEach(m => m.init(functionLayer));
-        } catch (e) {
-            throw e;
-        }
-    }
 };
 
-module.exports = new ModuleLoader();
+module.exports = ModuleLoader;
