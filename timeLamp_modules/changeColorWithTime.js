@@ -24,11 +24,12 @@ const MyModule = class {
             let lampIds = this.getIdsFromLamps(lampSettings);
             let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
 
-            this.setDefaultColor(lampIds, moduleSettings);
+            //this.setDefaultColor(lampIds, moduleSettings);
             return colorSchedule.getColorSchedule(roomSchedule, moduleSettings);
         }.bind(this))
             .then((colorSchedule) => {
-                this.nodeSchedules = this.makeNodeSchedule(colorSchedule);
+                console.log(JSON.stringify(colorSchedule, null, 2));
+                //this.nodeSchedules = this.makeNodeSchedule(colorSchedule);
             })
             .catch((e) => {
                 throw e;
