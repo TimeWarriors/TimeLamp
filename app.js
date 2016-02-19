@@ -25,7 +25,7 @@ const jobbOncePerDay =  nodeSchedule.scheduleRecurrenceEmittJob(
     emitter, 'daily', {}, 0, 9, [0, 4]);
 
 const jobbEveryHour =  nodeSchedule.scheduleRecurrenceEmittJob(
-    emitter, 'hourly', {}, 0, 1, null);
+    emitter, 'hourly', {}, 0, 4, null);
 
 
 /*Emit listeners*/
