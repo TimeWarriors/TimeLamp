@@ -4,8 +4,7 @@
   "description": "prototypes",
   "main": "app.js",
   "dependencies": {
-    "node-hid": "git+https://github.com/lorenc-tomasz/node-hid.git#package",
-    "node-blink1": "^0.2.2",
+    "chalk": "^1.1.1",
     "promise": "^7.1.1",
     "requirejs": "^2.1.22"
   },

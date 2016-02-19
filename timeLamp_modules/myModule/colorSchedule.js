@@ -12,22 +12,23 @@ const ColorSchedule = class  {
         let maxTimeVal = this.getMaxTimeValue(sortedSettings);
         let colorSchedule = [];
         roomSchedule.forEach((room) => {
-            if(this.isArrayLargerThanOne(room)){
-                colorSchedule.push(
-                    this.buildSchedule(
-                        room[0].booking.time.startTime,
-                        room[0].booking.id,
-                        sortedSettings
-                    )
-                );
-            }else{
-                colorSchedule.push(
-                    this.compareBookings(room, maxTimeVal, sortedSettings)
-                );
+            if(room[0].hasOwnProperty('booking')){
+                if(this.isArrayLargerThanOne(room)){
+                    colorSchedule.push(
+                        this.buildSchedule(
+                            room[0].booking.time.startTime,
+                            room[0].booking.id,
+                            sortedSettings
+                        )
+                    );
+                }else{
+                    colorSchedule.push(
+                        this.compareBookings(room, maxTimeVal, sortedSettings)
+                    );
+                }
             }
         });
-
-        return colorSchedule;
+        return [].concat.apply([], colorSchedule);
     }
 
     isArrayLargerThanOne(arr){
@@ -37,7 +38,8 @@ const ColorSchedule = class  {
     buildSchedule(time, id, sortedSettings){
         return {
             colorSchedule: this.timeBuilder(time, sortedSettings),
-            roomId: id
+            roomId: id,
+            startTime: this.buildDate(time)
         };
     }
 
@@ -96,7 +98,7 @@ const ColorSchedule = class  {
         if(f.length <= 0 && first.time !== 0){
             let aColor = this.colorTimeConverter.getColor(
                     first.time, last.time, a, first.color, last.color);
-            tempArray.push({ time: a, color: Math.floor(aColor) });
+            tempArray.push({ time: a, color: Math.floor(aColor), fade: true});
         }
 
         return this.sortSettingsOnTime(tempArray);
@@ -161,6 +163,10 @@ const ColorSchedule = class  {
         return (prev.getTime() - current.getTime())/1000/60;
     }
 
+    getTimeBetweenDatesRealDates(prev, current){
+        return (prev.getTime() - current.getTime())/1000/60;
+    }
+
     /**
      * [make color schedule object]
      * @param  {[string]} startTime     [start time for booking]
@@ -168,12 +174,22 @@ const ColorSchedule = class  {
      * @return {[array]}               [array pf color schedule objects]
      */
     timeBuilder(startTime, avalibleTimes){
-        return avalibleTimes.map((a) => {
-            return {
-                time: this.buildDate(startTime, a.time),
-                color: a.color
-            };
+        let scheduleObject = [];
+        avalibleTimes.reduce((prev, current, index, array) => {
+            if(prev === null){ return current; }
+            scheduleObject.push(
+                {
+                    time: this.buildDate(startTime, prev.time),
+                    color: prev.color,
+                    fade: prev.fade,
+                    emit: !prev.fade ? `time_${prev.time}` : false,
+                    timeDif: (this.addMinuteToDate(prev.time, 0).getTime() -
+                    this.addMinuteToDate(current.time, 0).getTime())/1000/60
+                }
+            );
+            return current;
         });
+        return scheduleObject;
     }
 
     splitTime(timeString){
