@@ -21,12 +21,11 @@ const functionLayer = {
 const moduleLoader = new ModuleLoader(functionLayer);
 
 /*Jobb creation*/
-const jobbOncePerDay =  nodeSchedule.scheduleRecurrenceEmittJob(
+const jobbOncePerDay = nodeSchedule.scheduleRecurrenceEmittJob(
     emitter, 'daily', {}, 0, 9, [0, 4]);
 
-const jobbEveryHour =  nodeSchedule.scheduleRecurrenceEmittJob(
+const jobbEveryHour = nodeSchedule.scheduleRecurrenceEmittJob(
     emitter, 'hourly', {}, 0, 4, null);
-
 
 /*Emit listeners*/
 emitter.on('daily', (data) => {
