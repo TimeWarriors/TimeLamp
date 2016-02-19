@@ -1,10 +1,10 @@
 'use strict';
 const co = require('co');
-const colorSchedule = require('./myModule/colorSchedule.js');
+const colorSchedule = require('./moduleHelpers/colorSchedule.js');
 
 const MyModule = class {
-    constructor(s) {
-        this._ = s;
+    constructor(functionLayer) {
+        this._ = functionLayer;
         this.nodeSchedules = [];
         this.settingsModule = require('../settings/modulesettings.js');
         this.timeEdidApiLnu = new this._.TimeeditDAL(
@@ -14,6 +14,9 @@ const MyModule = class {
 
     }
 
+    /**
+     * [module start function]
+     */
     init(){
         co(function* (){
             this.removeNodeScheduleEvents(this.nodeSchedules);
@@ -24,12 +27,11 @@ const MyModule = class {
             let lampIds = this.getIdsFromLamps(lampSettings);
             let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
 
-            //this.setDefaultColor(lampIds, moduleSettings);
+            this.setDefaultColor(lampIds, moduleSettings);
             return colorSchedule.getColorSchedule(roomSchedule, moduleSettings);
         }.bind(this))
             .then((colorSchedule) => {
-                console.log(JSON.stringify(colorSchedule, null, 2));
-                //this.nodeSchedules = this.makeNodeSchedule(colorSchedule);
+                this.nodeSchedules = this.makeNodeSchedule(colorSchedule);
             })
             .catch((e) => {
                 throw e;
@@ -77,21 +79,22 @@ const MyModule = class {
         });
     }
 
+    /**
+     * [removes all scheduled events]
+     * @param  {[array]} nodeScheduleEvents [array of scheduled events]
+     */
     removeNodeScheduleEvents(nodeScheduleEvents){
         if(!Array.isArray(nodeScheduleEvents)){
             throw 'nodeSchedule not array';
         }
         nodeScheduleEvents.forEach((jobCollections) => {
-            if(!Array.isArray(jobCollections)){
-                throw 'jobCollections not array';
-            }
-            jobCollections.forEach((job) => {
-                try {
-                    job.cancel();
-                } catch (e) {
-
-                }
-            });
+            try {
+                jobCollections.forEach((job) => {
+                    try {
+                        job.cancel();
+                    } catch (e) {}
+                });
+            } catch (e) {}
         });
 
     }
@@ -147,6 +150,6 @@ const MyModule = class {
     }
 };
 
-exports.run = function(s){
-    return new MyModule(s);
+exports.run = function(functionLayer){
+    return new MyModule(functionLayer);
 };
