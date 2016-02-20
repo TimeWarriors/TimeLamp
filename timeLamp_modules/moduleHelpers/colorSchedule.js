@@ -9,25 +9,29 @@ const ColorSchedule = class  {
     getColorSchedule(roomSchedule, moduleSettings){
         let sortedSettings = this.sortSettingsOnTime(moduleSettings);
         let maxTimeVal = this.getMaxTimeValue(sortedSettings);
-        let colorSchedule = [];
-        roomSchedule.forEach((room) => {
-            if(room[0].hasOwnProperty('booking')){ // not complete room object.
-                if(this.isArrayLargerThanOne(room)){
-                    colorSchedule.push(
-                        this.buildSchedule(
-                            room[0].booking.time.startTime,
-                            room[0].booking.id,
-                            sortedSettings
-                        )
-                    );
-                }else{
-                    colorSchedule.push(
-                        this.compareBookings(room, maxTimeVal, sortedSettings)
-                    );
-                }
-            }
+
+        let colorSchedule = roomSchedule.map((room) => {
+            // not complete room object.
+            if(!room[0].hasOwnProperty('booking')){ return null; }
+            return this.isArrayLargerThanOne(room) ?
+                this.buildSchedule(
+                    room[0].booking.time.startTime,
+                    room[0].booking.id,
+                    sortedSettings
+                ) :
+                this.compareBookings(
+                    room,
+                    maxTimeVal,
+                    sortedSettings);
         });
-        return [].concat.apply([], colorSchedule); // flattens array
+        return this.filterNull([].concat.apply([], colorSchedule));
+    }
+
+    /**
+     * [removes null values from array's]
+     */
+    filterNull(arr){
+        return arr.filter(i => i !== null);
     }
 
     /**
