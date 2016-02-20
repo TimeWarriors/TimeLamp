@@ -1,4 +1,4 @@
-'use strict';
+/*'use strict';
 
 const moduleLoader = require('./mouduleLoader/moduleLoader.js');
 const nodeSchedule = require('./nodeSchdule/nodeSchedule.js');
@@ -28,7 +28,7 @@ emitter.on('time_15', (event) => {
 
 emitter.on('time_5', (event) => {
     console.log('5 min');
-});
+});*/
 
 // const ModuleHandeler = class {
 //     constructor() {
