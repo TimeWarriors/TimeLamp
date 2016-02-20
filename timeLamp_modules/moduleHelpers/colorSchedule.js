@@ -53,6 +53,13 @@ const ColorSchedule = class  {
         };
     }
 
+    /**
+     * [compares a booking with a booking before it and build a colorScheudle for it]
+     * @param  {[array]} room           [contains booking for that room]
+     * @param  {[int]} maxTimeVal     [time in minutes]
+     * @param  {[array]} sortedSettings [settings for module]
+     * @return {[array]}                [colorSchedule for room bookings]
+     */
     compareBookings(room, maxTimeVal, sortedSettings){
         let colorSchedule = [];
         let lastElement;
@@ -91,14 +98,10 @@ const ColorSchedule = class  {
         let last = {time: 0, color: null};
         var tempArray = avalibleTimes.slice(0);
         avalibleTimes.forEach((item) => {
-            if(a > item.time){
-                if(last.time < item.time){
-                    last = item;
-                }
-            }else if(a < item.time){
-                if(first.time < item.time){
-                    first = item;
-                }
+            if(a > item.time && last.item < item.time){
+                last = item;
+            }else if(a < item.time && first.time < item.time){
+                first = item;
             }
         });
         let onlyDuplicates = avalibleTimes.filter((item) => {
@@ -110,7 +113,6 @@ const ColorSchedule = class  {
                     first.time, last.time, a, first.color, last.color);
             tempArray.push({ time: a, color: Math.floor(aColor), fade: true});
         }
-
         return this.sortSettingsOnTime(tempArray);
     }
 
@@ -192,8 +194,8 @@ const ColorSchedule = class  {
                     color: prev.color,
                     fade: prev.fade,
                     emit: !prev.fade ? `time_${prev.time}` : false,
-                    timeDif: (this.addMinuteToDate(prev.time, 0).getTime() -
-                    this.addMinuteToDate(current.time, 0).getTime())/1000/60
+                    timeDif: (this.addMinuteToDate(prev.time).getTime() -
+                        this.addMinuteToDate(current.time).getTime())/1000/60
                 }
             );
             return current;
