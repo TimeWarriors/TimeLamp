@@ -45,13 +45,15 @@ const MyModule = class {
         this._.settings.getLampsinRoom(properties.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamps) => {
-                    if(properties.fade === false){
-                        if(properties.emit !== false){ this.emittTimes(properties); }
-                        return this._.lightHandler.changeColorWithHue(lamps.lampId,
+                    if(properties.emit !== false){ this.emittTimes(properties); }
+
+                    return properties.fade ?
+                        this._.lightHandler.changeColorWithHue(lamps.lampId,
+                            properties.color,
+                            this.convertMinutesToSeconds(properties.timeDif)
+                        ) :
+                        this._.lightHandler.changeColorWithHue(lamps.lampId,
                             properties.color, 0);
-                    }
-                    return this._.lightHandler.changeColorWithHue(lamps.lampId,
-                        properties.color, this.convertMinutesToSeconds(properties.timeDif));
                 });
             }).catch((er) => {
                 console.log(er);
