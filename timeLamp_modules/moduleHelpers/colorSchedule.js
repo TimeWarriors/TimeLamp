@@ -6,7 +6,7 @@ const ColorSchedule = class  {
         this.colorTimeConverter = new C();
     }
 
-    getColorSchedule(roomSchedule, moduleSettings){
+    getColorTimeSchedule(roomSchedule, moduleSettings){
         let sortedSettings = this.sortSettingsOnTime(moduleSettings);
         let maxTimeVal = this.getMaxTimeValue(sortedSettings);
 

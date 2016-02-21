@@ -28,10 +28,10 @@ const MyModule = class {
             let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
 
             this.setDefaultColor(lampIds, moduleSettings);
-            return colorSchedule.getColorSchedule(roomSchedule, moduleSettings);
+            return colorSchedule.getColorTimeSchedule(roomSchedule, moduleSettings);
         }.bind(this))
-            .then((colorSchedule) => {
-                this.nodeSchedules = this.makeNodeSchedule(colorSchedule);
+            .then((colorTimeSchedule) => {
+                this.nodeSchedules = this.makeNodeSchedule(colorTimeSchedule);
             })
             .catch((e) => {
                 throw e;
@@ -66,8 +66,8 @@ const MyModule = class {
      * @param  {[array]} roomSchedule [contains times to book node schedule on]
      * @return {[object]}       [node schedule events]
      */
-    makeNodeSchedule(roomColorSchedule){
-        return roomColorSchedule.map((booking) => {
+    makeNodeSchedule(roomColorTimeSchedule){
+        return roomColorTimeSchedule.map((booking) => {
             return booking.colorSchedule.map((status) => {
                 return this._.nodeSchedule.scheduleFunctionCallJob(
                     new Date(status.time),
