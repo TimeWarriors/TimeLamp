@@ -1,6 +1,7 @@
 'use strict'
 let LightHandler = require('./lightHandler.js');
 let lightHandler = new LightHandler();
+let chalk = require('chalk');
 
 
 ////grön
@@ -16,14 +17,20 @@ let lightHandler = new LightHandler();
 //setTimeout(function(){lightHandler.changeColorWithHue("3", 0, 3)}, 7000)
 
 let lampToTest = "4";
+//lightHandler.setWarning("4", 500, 5, 0)
 
 testOn()
-    .then(function(res){
-    console.log(res);
-    testchangeBrigthnessAndChangeColorWithHue()
-    .then(function(res){
-    console.log(res);
-    })
+.then(function(res){
+console.log(res);
+testchangeBrigthnessAndChangeColorWithHue()
+.then(function(res){
+console.log(res);
+testSaturation()
+.then(function(res){
+console.log(res);
+    
+})
+})
 });
 
 //Test 1 changeColorWithHue and changeBrightness
@@ -39,53 +46,58 @@ function testchangeBrigthnessAndChangeColorWithHue(){
         //change color and brightness
         lightHandler.changeColorWithHue(lampToTest, firstColor, 0);
         lightHandler.changeBrightness(lampToTest, firstBrightness, 0);
-        lightHandler.getHueLamps().then(function(res){
-            //FIRST RESULT
-            var object = JSON.parse(res);
-            console.log("changeColorWithHue test 1) expected result: " + firstColor + " actual result: " + object[lampToTest].state.hue)
-            console.log("changeBrightness test 1) expected result: " + firstBrightness + " actual result: " + object[lampToTest].state.bri)
-            //see if the color and brighness is what you wanted to change it to
-            if(firstColor === object[lampToTest].state.hue && firstBrightness === object[lampToTest].state.bri)
-            {
-                //change color and brightness
-                lightHandler.changeColorWithHue(lampToTest, secondColor, 0);
-                lightHandler.changeBrightness(lampToTest, secondBrightness, 0);
-                lightHandler.getHueLamps().then(function(res){
-                    var object = JSON.parse(res);
-                    //SECOND RESULT
-                    console.log("changeColorWithHue test 2) expected result: " + secondColor + " actual result: " + object[lampToTest].state.hue);
-                    console.log("changeBrightness test 2) expected result: " + secondBrightness + " actual result: " + object[lampToTest].state.bri)
+        setTimeout(function(){
+             lightHandler.getHueLamps().then(function(res){
+                //FIRST RESULT
+                var object = JSON.parse(res);
+                console.log("changeColorWithHue test 1) expected result: " + firstColor + " actual result: " + object[lampToTest].state.hue)
+                console.log("changeBrightness test 1) expected result: " + firstBrightness + " actual result: " + object[lampToTest].state.bri)
+                //see if the color and brighness is what you wanted to change it to
+                if(firstColor === object[lampToTest].state.hue && firstBrightness === object[lampToTest].state.bri)
+                {
+                    //change color and brightness
+                    lightHandler.changeColorWithHue(lampToTest, secondColor, 0);
+                    lightHandler.changeBrightness(lampToTest, secondBrightness, 0);
+                    setTimeout(function(){
+                        lightHandler.getHueLamps().then(function(res){
+                        var object = JSON.parse(res);
+                        //SECOND RESULT
+                        console.log("changeColorWithHue test 2) expected result: " + secondColor + " actual result: " + object[lampToTest].state.hue);
+                        console.log("changeBrightness test 2) expected result: " + secondBrightness + " actual result: " + object[lampToTest].state.bri)
 
-                    //FINAL RESULT
-                    if(secondColor === object[lampToTest].state.hue)//see if color was changed correctly
-                    {
-                        if(secondBrightness === object[lampToTest].state.bri)//see if brightness was changed correctly.
+                        //FINAL RESULT
+                        if(secondColor === object[lampToTest].state.hue)//see if color was changed correctly
                         {
-                            return resolve("changeBrightness & changeColorWithHue: the functions correctly changes brightness and color. Success!");
+                            if(secondBrightness === object[lampToTest].state.bri)//see if brightness was changed correctly.
+                            {
+                                return resolve(chalk.green("changeBrightness & changeColorWithHue: the functions correctly changes brightness and color. Success!"))
+                            }
+                            else
+                            {
+                                return resolve(chalk.red("changeBrightness: the function incorrectly changes brightness. Fail!"))
+                            }
                         }
                         else
                         {
-                            return resolve("changeBrightness: the function incorrectly changes brightness. Fail!")
+                            return resolve(chalk.red("changeColorWithHue: the function incorrectly changes color. Fail!"))
                         }
-                    }
-                    else
+                    })
+                    },200)
+                }
+                else
+                {
+                    if(firstColor !== object[lampToTest].state.hue)
                     {
-                        return resolve("changeColorWithHue: the function incorrectly changes color. Fail!")
+                        return resolve(chalk.red("changeColorWithHue: the function incorrectly changes color. Fail!"))
                     }
-                })
-            }
-            else
-            {
-                if(firstColor !== object[lampToTest].state.hue)
-                {
-                    return resolve("changeColorWithHue: the function incorrectly changes color. Fail!")
+                    if(firstBrightness === object[lampToTest].state.bri)
+                    {
+                        return resolve(chalk.red("changeBrightness: the function incorrectly changes brightness. Fail!"))
+                    }
                 }
-                if(firstBrightness === object[lampToTest].state.bri)
-                {
-                    return resolve("changeBrightness: the function incorrectly changes brightness. Fail!")
-                }
-            }
-        });
+            });           
+        },200)
+
     })
 
 }
@@ -98,31 +110,77 @@ function testOn(){
     let firstStatus = false;
     let secondStatus = true;
     lightHandler.On(lampToTest, firstStatus);
-    lightHandler.getHueLamps().then(function(res){
-        let object = JSON.parse(res);
-        console.log("on test 1) expected result: " + firstStatus + " actual result: " + object[lampToTest].state.on)
-        if(object[lampToTest].state.on === firstStatus)
-        {
-            lightHandler.On(lampToTest, secondStatus);
+    setTimeout(function(){
+        lightHandler.getHueLamps().then(function(res){
+            let object = JSON.parse(res);
+            console.log("on test 1) expected result: " + firstStatus + " actual result: " + object[lampToTest].state.on)
+            if(object[lampToTest].state.on === firstStatus)
+            {
+                setTimeout(function(){
+                    lightHandler.On(lampToTest, secondStatus);
+                    lightHandler.getHueLamps().then(function(res){
+                        let object = JSON.parse(res);
+                        console.log("on test 2) expected result: " + secondStatus + " actual result: " + object[lampToTest].state.on)
+                        if(object[lampToTest].state.on === secondStatus)
+                        {          
+                            return resolve(chalk.green("On: turns the lamp on and off correctly. Success"))
+                        }
+                        else
+                        {
+                            return resolve(chalk.red("On: does not turn on the lamp correctly. FAIL!"))
+                        }
+                    })
+                }, 200)
+            }                                    
+            else
+            {
+                return resolve(chalk.red("On: does not turn off the lamp correctly. FAIL!"))
+            }   
+        }) 
+    }, 200)
+   
+ 
+  })
+}
+
+function testSaturation(){
+    return new Promise((resolve, reject) => {
+        console.log("╔═══════════════════════════════════════╗");
+        console.log("║            changeSaturation           ║");
+        console.log("╚═══════════════════════════════════════╝");
+        let firstSat = 100;
+        let secondSat = 254;
+        lightHandler.changeSaturation(lampToTest, firstSat, 0);
+        setTimeout(function(){
             lightHandler.getHueLamps().then(function(res){
                 let object = JSON.parse(res);
-                console.log("on test 2) expected result: " + secondStatus + " actual result: " + object[lampToTest].state.on)
-                if(object[lampToTest].state.on === secondStatus)
-                {          
-                    return resolve("On: turns the lamp on and off correctly. Success")
+                console.log("changeSaturation test 1) expected result: " + firstSat + " actual result: " + object[lampToTest].state.sat);
+                if(object[lampToTest].state.sat === firstSat)
+                { 
+                    setTimeout(function(){
+                        lightHandler.changeSaturation(lampToTest, secondSat, 0)
+                        lightHandler.getHueLamps().then(function(res){
+                            let object = JSON.parse(res);
+                            console.log("changeSaturation test 2) expected result: " + secondSat + " actual result: " + object[lampToTest].state.sat);
+                            if(object[lampToTest].state.sat === secondSat)
+                            {
+                                return resolve(chalk.green("changeSaturation: successfully changes the saturation. Success!"));
+                            }
+                            else
+                            {
+                                 return resolve(chalk.red("changeSaturation: failed to change the saturation. FAIL!\nBecause of delays to the main hub this test may show the wrong result. Please try a couple of times to see if it's a consisten result or only happens once in a while"));
+                            }
+                        })    
+                    }, 300)        
                 }
                 else
                 {
-                    return resolve("On: does not turn on the lamp correctly. FAIL!")
+                     return resolve(chalk.red("changeSaturation: failed to change the saturation. FAIL!"));
                 }
-            })
-        }                                    
-        else
-        {
-            return resolve("On: does not turn off the lamp correctly. FAIL!")
-        }       
-    })  
-  })
+            });            
+        }, 200)
+
+    })
 }
 
 
