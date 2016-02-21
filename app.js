@@ -43,3 +43,10 @@ emitter.on('time_15', (event) => {
 emitter.on('time_5', (event) => {
     console.log('5 min');
 });
+
+emitter.on('time_0', (event) => {
+    console.log('5 min');
+});
+
+/*start modules on server start*/
+moduleLoader.runModules();
