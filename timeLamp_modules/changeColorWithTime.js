@@ -11,7 +11,6 @@ const MyModule = class {
                 'https://se.timeedit.net/web/lnu/db1/schema1/',
                 4
             );
-
     }
 
     /**
@@ -28,10 +27,10 @@ const MyModule = class {
             let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
 
             this.setDefaultColor(lampIds, moduleSettings);
-            return colorSchedule.getColorSchedule(roomSchedule, moduleSettings);
+            return colorSchedule.getColorTimeSchedule(roomSchedule, moduleSettings);
         }.bind(this))
-            .then((colorSchedule) => {
-                this.nodeSchedules = this.makeNodeSchedule(colorSchedule);
+            .then((colorTimeSchedule) => {
+                this.nodeSchedules = this.makeNodeSchedule(colorTimeSchedule);
             })
             .catch((e) => {
                 throw e;
@@ -48,9 +47,11 @@ const MyModule = class {
                 lampsInRoom.forEach((lamps) => {
                     if(properties.fade === false){
                         if(properties.emit !== false){ this.emittTimes(properties); }
-                        return this._.lightHandler.changeColorWithHue(lamps.lampId, properties.color, 0);
+                        return this._.lightHandler.changeColorWithHue(lamps.lampId,
+                            properties.color, 0);
                     }
-                    return this._.lightHandler.changeColorWithHue(lamps.lampId, properties.color, (properties.timeDif*60));
+                    return this._.lightHandler.changeColorWithHue(lamps.lampId,
+                        properties.color, this.convertMinutesToSeconds(properties.timeDif));
                 });
             }).catch((er) => {
                 console.log(er);
@@ -61,19 +62,27 @@ const MyModule = class {
         this._.emitter.emit(properties.emit, properties);
     }
 
+    convertMinutesToSeconds(time){
+        return time*60;
+    }
+
     /**
      * [will book node schedules to run function at specific time]
      * @param  {[array]} roomSchedule [contains times to book node schedule on]
      * @return {[object]}       [node schedule events]
      */
-    makeNodeSchedule(roomColorSchedule){
-        return roomColorSchedule.map((booking) => {
+    makeNodeSchedule(roomColorTimeSchedule){
+        return roomColorTimeSchedule.map((booking) => {
             return booking.colorSchedule.map((status) => {
                 return this._.nodeSchedule.scheduleFunctionCallJob(
                     new Date(status.time),
-                    this.changeColor.bind(this),
-                    { color: status.color, roomId: booking.roomId,
-                        timeDif: status.timeDif, fade: status.fade, emit: status.emit }
+                    this.changeColor.bind(this),{
+                        color: status.color,
+                        roomId: booking.roomId,
+                        timeDif: status.timeDif,
+                        fade: status.fade,
+                        emit: status.emit
+                    }
                 );
             });
         });
