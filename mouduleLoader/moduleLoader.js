@@ -22,7 +22,7 @@ const ModuleLoader = class {
             try {
                 timeLampModule.init();
             } catch (e) {
-                fsp.writeFile('debuglog.txt', e);
+                fsp.writeFile(`${__dirname}/debuglog.txt`, e);
             }
         });
     }
