@@ -6,7 +6,7 @@ const ColorSchedule = class  {
         this.colorTimeConverter = new C();
     }
 
-    getColorSchedule(roomSchedule, moduleSettings){
+    getColorTimeSchedule(roomSchedule, moduleSettings){
         let sortedSettings = this.sortSettingsOnTime(moduleSettings);
         let maxTimeVal = this.getMaxTimeValue(sortedSettings);
 
@@ -14,15 +14,15 @@ const ColorSchedule = class  {
             // not complete room object.
             if(!room[0].hasOwnProperty('booking')){ return null; }
             return this.isArrayLargerThanOne(room) ?
+                this.compareBookings(
+                    room,
+                    maxTimeVal,
+                    sortedSettings) :
                 this.buildSchedule(
                     room[0].booking.time.startTime,
                     room[0].booking.id,
                     sortedSettings
-                ) :
-                this.compareBookings(
-                    room,
-                    maxTimeVal,
-                    sortedSettings);
+                );
         });
         return this.filterNull([].concat.apply([], colorSchedule));
     }
@@ -38,7 +38,7 @@ const ColorSchedule = class  {
      * [check if array is larger than one]
      */
     isArrayLargerThanOne(arr){
-        return arr.length <= 1;
+        return arr.length >= 1;
     }
 
     /**
@@ -84,7 +84,7 @@ const ColorSchedule = class  {
             return current;
         }, null);
         colorSchedule.push(lastElement);
-        return colorSchedule;
+        return colorSchedule.reverse();
     }
 
     /**
@@ -186,14 +186,15 @@ const ColorSchedule = class  {
      */
     timeBuilder(startTime, avalibleTimes){
         let scheduleObject = [];
-        avalibleTimes.reduce((prev, current, index, array) => {
-            if(prev === null){ return current; }
+        var tempArray = avalibleTimes.slice(0);
+        tempArray[tempArray.length] = tempArray[tempArray.length-1];
+        tempArray.reduce((prev, current, index, array) => {
             scheduleObject.push(
                 {
                     time: this.buildDate(startTime, prev.time),
                     color: prev.color,
                     fade: prev.fade,
-                    emit: !prev.fade ? `time_${prev.time}` : false,
+                    emit: prev.emit ? `time_${prev.time}` : false,
                     timeDif: (this.addMinuteToDate(prev.time).getTime() -
                         this.addMinuteToDate(current.time).getTime())/1000/60
                 }
