@@ -63,7 +63,9 @@ LightHandler.prototype.changeBrightness = function(lampId, brightness, secondsTo
         method: 'PUT',
         headers: headers
     };
-    http.request(options).write(bodyMessage);
+    let req = http.request(options)
+    req.write(bodyMessage);
+    req.end();
 }
 
 LightHandler.prototype.changeSaturation = function(lampId, saturation, secondsToChange)
@@ -82,7 +84,9 @@ LightHandler.prototype.changeSaturation = function(lampId, saturation, secondsTo
         method: 'PUT',
         headers: headers
     };
-    http.request(options).write(bodyMessage);
+    let req = http.request(options)
+    req.write(bodyMessage);
+    req.end();
 }
 
 LightHandler.prototype.changeColor = function(lampId, r, g, b, secondsToChange){
@@ -107,7 +111,9 @@ LightHandler.prototype.changeColor = function(lampId, r, g, b, secondsToChange){
         method: 'PUT',
         headers: headers
     };
-    http.request(options).write(bodyMessage);
+    let req = http.request(options)
+    req.write(bodyMessage);
+    req.end();
     
 }
 LightHandler.prototype.On = function(lampId, status){
@@ -124,7 +130,9 @@ LightHandler.prototype.On = function(lampId, status){
         method: 'PUT',
         headers: headers
     };
-    http.request(options).write(bodyMessage);
+    let req = http.request(options)
+    req.write(bodyMessage);
+    req.end();
 }
 //lampid, bool on, blinkrate ms(optional defaults to 1000)
 LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
@@ -185,7 +193,9 @@ LightHandler.prototype.changeColorWithHue = function(lampId, hue, secondsToChang
         method: 'PUT',
         headers: headers
     };
-    http.request(options).write(bodyMessage);
+    let req = http.request(options)
+    req.write(bodyMessage);
+    req.end();
 }
 
 module.exports = LightHandler;

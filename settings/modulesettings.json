@@ -2,24 +2,35 @@
     {
         "time": 120,
         "color": 25500,
-        "fade": true
+        "fade": true,
+        "emit": false
     },
 
     {
         "time": 60,
         "color": 20678,
-        "fade": true
+        "fade": true,
+        "emit": false
     },
 
     {
         "time": 15,
         "color":6375,
-        "fade": false
+        "fade": false,
+        "emit": true
     },
 
     {
         "time": 5,
-        "color": 65535,
-        "fade": false
+        "color": 0,
+        "fade": false,
+        "emit": true
+    },
+
+    {
+        "time": 0,
+        "color": 0,
+        "fade": false,
+        "emit": true
     }
 ]
