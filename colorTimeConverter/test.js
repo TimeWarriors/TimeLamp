@@ -1,16 +1,18 @@
 'use strict'
 let ColorTimeConverter = require('./colorTimeConverter.js');
 let colorTimeConverter = new ColorTimeConverter();
+let assert = require('assert')
 
-let startColor = 65535;
-let endColor = 25500;
-let expectedResult = startColor-(startColor-endColor)/3;
-let result = colorTimeConverter.getColor(15, 0, 10, startColor, endColor);
-if(result === expectedResult)
-{
-    console.log("Expected result was: "+expectedResult+" got: "+result+"\nTest Succeeded!");
-}
-else
-{
-    console.log("Expected result was: "+expectedResult+" got: "+result+"\Test FAILED!");
-}
+describe('colorTimeConverter.getColor()', function() {
+  var tests = [
+    {args: [15, 0, 10, 65535, 25500],       expected: 65535-(65535-25500)/3},
+    {args: [10, 0, 5, 25500, 0],       expected: 25500-(25500-0)/2},
+  ];
+
+  tests.forEach(function(test) {
+    it('correctly calculates ' + test.args + ' to ' + test.expected, function() {
+      var res = colorTimeConverter.getColor.apply(null, test.args);
+      assert.equal(res, test.expected);
+    });
+  });
+});
