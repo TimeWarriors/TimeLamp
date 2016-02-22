@@ -11,17 +11,19 @@ const ColorSchedule = class  {
         let maxTimeVal = this.getMaxTimeValue(sortedSettings);
 
         let colorSchedule = roomSchedule.map((room) => {
+
             // not complete room object.
             if(!room[0].hasOwnProperty('booking')){ return null; }
             return this.isArrayLargerThanOne(room) ?
-                this.compareBookings(
+                this.compareBookingTimes(
                     room,
                     maxTimeVal,
                     sortedSettings) :
                 this.buildSchedule(
                     room[0].booking.time.startTime,
                     room[0].booking.id,
-                    sortedSettings
+                    sortedSettings,
+                    room[0].booking.time.endTime
                 );
         });
         return this.filterNull([].concat.apply([], colorSchedule));
@@ -38,53 +40,56 @@ const ColorSchedule = class  {
      * [check if array is larger than one]
      */
     isArrayLargerThanOne(arr){
-        return arr.length >= 1;
+        return arr.length >= 2;
     }
 
     /**
      * [build colorSchedule for a booking]
      * @return {[object]}    [colorSchedule for a booking]
      */
-    buildSchedule(time, id, sortedSettings){
+    buildSchedule(time, id, avalibleTimes, endTime){
         return {
-            colorSchedule: this.timeBuilder(time, sortedSettings),
+            colorSchedule: this.timeBuilder(time, avalibleTimes),
             roomId: id,
-            startTime: this.buildDate(time)
+            startTime: this.buildDate(time),
+            endTime: this.buildDate(endTime)
         };
     }
 
     /**
-     * [compares a booking with a booking before it and build a colorScheudle for it]
+     * [compares a booking with a booking before it and build a colorSchedule for it]
      * @param  {[array]} room           [contains booking for that room]
      * @param  {[int]} maxTimeVal     [time in minutes]
      * @param  {[array]} sortedSettings [settings for module]
      * @return {[array]}                [colorSchedule for room bookings]
      */
-    compareBookings(room, maxTimeVal, sortedSettings){
+    compareBookingTimes(room, maxTimeVal, sortedSettings){
         let colorSchedule = [];
-        let lastElement;
+        let lastElement = null;
         room.reduceRight((prev, current, index, array) => {
             if(prev === null){ return current; }
             let endTime = current.booking.time.endTime;
             let startTime = prev.booking.time.startTime;
+            let prevEndTime = prev.booking.time.endTime;
 
-            lastElement = this.buildSchedule(current.booking.time.startTime, current.booking.id, sortedSettings);
+            lastElement = this.buildSchedule(current.booking.time.startTime, current.booking.id, sortedSettings, current.booking.time.endTime);
             if(this.isFullIntervall(startTime, maxTimeVal, endTime)){
                 colorSchedule.push(
-                    this.buildSchedule(startTime, prev.booking.id, sortedSettings)
+                    this.buildSchedule(startTime, prev.booking.id, sortedSettings, prevEndTime)
                 );
             }else{
+
                 let timeBetweenDates = this.getTimeBetweenDates(startTime, endTime);
                 let timeSchedule = this.addTimeToArray(sortedSettings, timeBetweenDates);
                 let avalibleTimes = this.getAllTimesAfter(timeSchedule, timeBetweenDates);
                 colorSchedule.push(
-                    this.buildSchedule(startTime, prev.booking.id, avalibleTimes)
+                    this.buildSchedule(startTime, prev.booking.id, avalibleTimes, prevEndTime)
                 );
             }
             return current;
         }, null);
         colorSchedule.push(lastElement);
-        return colorSchedule.reverse();
+        return this.endTimeBuilder(colorSchedule.reverse(), maxTimeVal);
     }
 
     /**
@@ -163,7 +168,7 @@ const ColorSchedule = class  {
      * @return {Boolean}         [returns if maxtimeVal i smaller than time dif]
      */
     isFullIntervall(startTime, maxTimeVal, endTime){
-        return this.getTimeBetweenDates(startTime, endTime, maxTimeVal) >= maxTimeVal;
+        return this.getTimeBetweenDates(startTime, endTime) >= maxTimeVal;
     }
 
     /**
@@ -173,8 +178,12 @@ const ColorSchedule = class  {
      * @return {[int]}         [time between dates]
      */
     getTimeBetweenDates(startTime, endTime, startDif, endDif){
-        startTime = this.buildDate(startTime, startDif);
-        endTime = this.buildDate(endTime, endDif);
+        if(startTime instanceof Date &&
+        endTime instanceof Date){
+        }else{
+            startTime = this.buildDate(startTime, startDif);
+            endTime = this.buildDate(endTime, endDif);
+        }
         return (startTime.getTime() - endTime.getTime())/1000/60;
     }
 
@@ -190,18 +199,68 @@ const ColorSchedule = class  {
         tempArray[tempArray.length] = tempArray[tempArray.length-1];
         tempArray.reduce((prev, current, index, array) => {
             scheduleObject.push(
-                {
-                    time: this.buildDate(startTime, prev.time),
-                    color: prev.color,
-                    fade: prev.fade,
-                    emit: prev.emit ? `time_${prev.time}` : false,
-                    timeDif: (this.addMinuteToDate(prev.time).getTime() -
-                        this.addMinuteToDate(current.time).getTime())/1000/60
-                }
+                this.timeObject(
+                    this.buildDate(startTime, prev.time),
+                    prev.color,
+                    prev.fade,
+                    prev.emit,
+                    (this.addMinuteToDate(prev.time).getTime() -
+                        this.addMinuteToDate(current.time).getTime())/1000/60,
+                    prev.time
+                )
             );
             return current;
         });
         return scheduleObject;
+    }
+
+    /**
+     * [holds the colorSchedule object]
+     * */
+    timeObject(time, color, fade, emit, timeDif, timeFromStart){
+        return {
+            time,
+            color,
+            fade,
+            emit: emit ? `time_${timeFromStart}` : false,
+            timeDif
+        };
+    }
+
+    /**
+     * [creates endTime ColorSchedule for bookings]
+     * @return {[array]}               [colorSchedule with end times]
+     */
+    endTimeBuilder(colorSchedule, maxTimeVal){
+        let lastElement;
+        colorSchedule.reduce((prev, current, index, array) => {
+            let prevEndTime = prev.endTime;
+            let currentStartTime = current.startTime;
+            let currentEndTime = current.endTime;
+            lastElement = this.timeObject(
+                currentEndTime,
+                10,
+                false,
+                true,
+                null,
+                'bookingEnd'
+            );
+            if(this.isFullIntervall(currentStartTime, maxTimeVal, prevEndTime)){
+                prev.colorSchedule.push(
+                    this.timeObject(
+                        prevEndTime,
+                        10,
+                        false,
+                        true,
+                        null,
+                        'bookingEnd'
+                    )
+                );
+            }
+            return current;
+        });
+        colorSchedule[colorSchedule.length-1].colorSchedule.push(lastElement);
+        return colorSchedule;
     }
 
     splitTime(timeString){
