@@ -26,8 +26,8 @@ const MyModule = class {
             let lampIds = this.getIdsFromLamps(lampSettings);
             let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
 
-            this.setDefaultColor(lampIds, moduleSettings);
-            return colorSchedule.getColorTimeSchedule(roomSchedule, moduleSettings);
+            this.setDefaultColor(lampIds, moduleSettings.roomAvalibleColor);
+            return colorSchedule.getColorTimeSchedule(roomSchedule, moduleSettings.preRoomBookingTimes, moduleSettings.roomAvalibleColor);
         }.bind(this))
             .then((colorTimeSchedule) => {
                 this.nodeSchedules = this.makeNodeSchedule(colorTimeSchedule);
@@ -153,10 +153,9 @@ const MyModule = class {
      * @param {[array]} lamps          [array of lamp objects]
      * @param {[object]} moduleSettings [settings object for this module]
      */
-    setDefaultColor(lampIds, moduleSettings){
+    setDefaultColor(lampIds, defaultColor){
         lampIds.forEach(lampId =>
-            this._.lightHandler.changeColor(lampId, moduleSettings.defaltColor[0],
-                moduleSettings.defaltColor[1], moduleSettings.defaltColor[2])
+            this._.lightHandler.changeColorWithHue(lampId, defaultColor, 0)
         );
     }
 };
