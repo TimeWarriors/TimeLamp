@@ -77,7 +77,6 @@ const ColorSchedule = class {
      * @return {[array]}                [colorSchedule for room bookings]
      */
     compareBookingTimes(room, maxTimeVal, avalibleTimes){
-
         let colorSchedule = [];
         let lastElement;
 
@@ -167,7 +166,6 @@ const ColorSchedule = class {
         let scheduleObject = [];
         var tempArray = this.arrayHelper.copyArray(avalibleTimes);
         tempArray[tempArray.length] = tempArray[tempArray.length-1];
-
         tempArray.reduce((prev, current, index, array) => {
             scheduleObject.push(
                 this.timeObject(
@@ -175,6 +173,7 @@ const ColorSchedule = class {
                     prev.color,
                     current.color,
                     prev.fade,
+                    prev.pulse,
                     prev.emit,
                     this.dateHelper.getTimeBetweenDates(
                         this.dateHelper.addMinuteToDate(prev.time),
@@ -190,12 +189,13 @@ const ColorSchedule = class {
     /**
      * [holds the colorSchedule object]
      * */
-    timeObject(time, color, nextColor,fade, emit, timeDif, timeFromStart){
+    timeObject(time, color, nextColor, fade, pulse, emit, timeDif, timeFromStart){
         return {
             time,
             color,
             nextColor,
             fade,
+            pulse,
             emit: emit ? `time_${timeFromStart}` : false,
             timeDif,
             timeFromStart
@@ -209,12 +209,12 @@ const ColorSchedule = class {
     endTimeBuilder(roomsColorSchdule, maxTimeVal, avalibleColor){
         let lastElement;
         roomsColorSchdule.forEach((room) => {
-
             if(!this.arrayHelper.isArrayLargerThanOne(room)){
                 lastElement = this.timeObject(
                     room[0].endTime,
                     avalibleColor,
                     avalibleColor,
+                    false,
                     false,
                     true,
                     null,
@@ -232,6 +232,7 @@ const ColorSchedule = class {
                     avalibleColor,
                     avalibleColor,
                     false,
+                    false,
                     true,
                     null,
                     'bookingEnd'
@@ -242,6 +243,7 @@ const ColorSchedule = class {
                             prevEndTime,
                             avalibleColor,
                             avalibleColor,
+                            false,
                             false,
                             true,
                             null,
