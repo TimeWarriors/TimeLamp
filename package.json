@@ -21,8 +21,6 @@
     "events": "^1.1.0",
     "file-cache-simple": "0.0.3",
     "fs-promise": "^0.4.1",
-    "node-blink1": "^0.2.2",
-    "node-hid": "git+https://github.com/lorenc-tomasz/node-hid.git#package",
     "node-schedule": "^1.0.0",
     "timeeditapi": "^2.0.0"
   }
