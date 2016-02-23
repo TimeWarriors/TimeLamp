@@ -30,7 +30,6 @@ const ColorSchedule = class {
                         room[0].booking.time.endTime)
                 )];
         });
-
         return this.arrayHelper.concatArray(
                 this.endTimeBuilder(
                     this.arrayHelper.filterNull(colorSchedule), maxTimeVal, avalibleColor));
@@ -174,6 +173,7 @@ const ColorSchedule = class {
                 this.timeObject(
                     this.dateHelper.subtractTime(startTime, prev.time),
                     prev.color,
+                    current.color,
                     prev.fade,
                     prev.emit,
                     this.dateHelper.getTimeBetweenDates(
@@ -190,10 +190,11 @@ const ColorSchedule = class {
     /**
      * [holds the colorSchedule object]
      * */
-    timeObject(time, color, fade, emit, timeDif, timeFromStart){
+    timeObject(time, color, nextColor,fade, emit, timeDif, timeFromStart){
         return {
             time,
             color,
+            nextColor,
             fade,
             emit: emit ? `time_${timeFromStart}` : false,
             timeDif,
@@ -208,12 +209,27 @@ const ColorSchedule = class {
     endTimeBuilder(roomsColorSchdule, maxTimeVal, avalibleColor){
         let lastElement;
         roomsColorSchdule.forEach((room) => {
+
+            if(!this.arrayHelper.isArrayLargerThanOne(room)){
+                lastElement = this.timeObject(
+                    room[0].endTime,
+                    avalibleColor,
+                    avalibleColor,
+                    false,
+                    true,
+                    null,
+                    'bookingEnd'
+                );
+                room[room.length-1].colorSchedule.push(lastElement);
+                return;
+            }
             room.reduce((prev, current, index, array) => {
                 let prevEndTime = prev.endTime;
                 let currentStartTime = current.startTime;
                 let currentEndTime = current.endTime;
                 lastElement = this.timeObject(
                     currentEndTime,
+                    avalibleColor,
                     avalibleColor,
                     false,
                     true,
@@ -224,6 +240,7 @@ const ColorSchedule = class {
                     prev.colorSchedule.push(
                         this.timeObject(
                             prevEndTime,
+                            avalibleColor,
                             avalibleColor,
                             false,
                             true,
