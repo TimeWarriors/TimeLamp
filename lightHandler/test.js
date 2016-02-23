@@ -38,6 +38,42 @@ describe('lightHandler.getHueLamps()', function() {
   })      
 });
 
+describe('lightHandler.changeColorWithHue()', function() {
+    var argnr = 0;
+    var testLampId = "2";
+    var tests = [
+      {args: [testLampId, 20678, 0], expected: 20678},
+      {args: [testLampId, 0, 0], expected: 0},
+      {args: [testLampId, 30000, 0], expected: 30000},
+    ];   
+    beforeEach(function () {
+        lightHandler.changeColorWithHue.apply(null, tests[argnr].args);
+        argnr++;
+    })
+
+    tests.forEach(function(test) {
+        it("Change color to "+test.expected, function(done) {
+            lightHandler.getHueLampById.call(null, testLampId).then(function(res){
+                let hueColor = JSON.parse(res).state.hue;
+                try{
+                    if(hueColor == test.expected)
+                    {
+                        assert(true, "Expected: "+test.expected+" got: "+hueColor);
+                    }
+                    else
+                    {
+                        assert(false, "Expected: "+test.expected+" got: "+hueColor);
+                    }
+                    done();                    
+                }
+                catch(e){
+                    return done(e);
+                }
+
+            })   
+        });  
+    })      
+});
 
 
 
