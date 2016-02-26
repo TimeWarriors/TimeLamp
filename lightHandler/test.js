@@ -48,6 +48,7 @@ describe('lightHandler.changeColorWithHue()', function() {
     ];   
     beforeEach(function () {
         lightHandler.changeColorWithHue.apply(null, tests[argnr].args);
+        console.log("Test changing hue with parameters: " + tests[argnr].args);
         argnr++;
     })
 
@@ -85,6 +86,7 @@ describe('lightHandler.changeBrightness()', function() {
     ];   
     beforeEach(function () {
         lightHandler.changeBrightness.apply(null, tests[argnr].args);
+        console.log("Test changing bri with parameters: " + tests[argnr].args);
         argnr++;
     })
 
@@ -112,42 +114,44 @@ describe('lightHandler.changeBrightness()', function() {
     })      
 });
 
-//describe('lightHandler.changeSaturation()', function() {
-//    var argnr = 0;
-//    var testLampId = "2";
-//    var tests = [
-//      {args: [testLampId, 125, 0], expected: 125},
-//      {args: [testLampId, 0, 0], expected: 0},
-//      {args: [testLampId, 254, 0], expected: 254},
-//    ];   
-//    beforeEach(function () {
-//        lightHandler.changeSaturation.apply(null, tests[argnr].args);
-//        argnr++;
-//    })
-//
-//    tests.forEach(function(test) {
-//        it("Change saturation to "+test.expected, function(done) {
-//            lightHandler.getHueLampById.call(null, testLampId).then(function(res){
-//                let hueSat = JSON.parse(res).state.sat;
-//                try{
-//                    if(hueSat == test.expected)
-//                    {
-//                        assert(true, "Expected: "+test.expected+" got: "+hueSat);
-//                    }
-//                    else
-//                    {
-//                        assert(false, "Expected: "+test.expected+" got: "+hueSat);
-//                    }
-//                    done();                    
-//                }
-//                catch(e){
-//                    return done(e);
-//                }
-//
-//            })   
-//        });  
-//    })      
-//});
+describe('lightHandler.changeSaturation()', function() {
+    var argnr = 0;
+    var testLampId = "2";
+    var tests = [
+      {args: [testLampId, 125, 0], expected: 125},
+      {args: [testLampId, 0, 0], expected: 0},
+      {args: [testLampId, 254, 0], expected: 254},
+    ];   
+    beforeEach(function () {
+        lightHandler.changeSaturation.apply(null, tests[argnr].args);
+        console.log("Test changing sat with parameters: " + tests[argnr].args);
+        argnr++;
+    })
+
+    tests.forEach(function(test) {
+        
+        it("Change saturation to "+test.expected, function(done) {
+            lightHandler.getHueLampById.call(null, testLampId).then(function(res){
+                let hueSat = JSON.parse(res).state.sat;
+                try{
+                    if(hueSat == test.expected)
+                    {
+                        assert(true, "Expected: "+test.expected+" got: "+hueSat);
+                    }
+                    else
+                    {
+                        assert(false, "Expected: "+test.expected+" got: "+hueSat);
+                    }
+                    done();                    
+                }
+                catch(e){
+                    return done(e);
+                }
+
+            })   
+        });  
+    })      
+});
 
 
 
