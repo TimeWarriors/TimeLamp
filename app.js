@@ -22,10 +22,10 @@ const moduleLoader = new ModuleLoader(functionLayer);
 
 /*Jobb creation*/
 const jobbOncePerDay = nodeSchedule.scheduleRecurrenceEmittJob(
-    emitter, 'daily', {}, 0, 9, [0, 4]);
+    emitter, 'daily', {}, 0, 7, [0, 6]);
 
 const jobbEveryHour = nodeSchedule.scheduleRecurrenceEmittJob(
-    emitter, 'hourly', {}, 0, 4, null);
+    emitter, 'hourly', {}, 0, 2, null);
 
 /*Emit listeners*/
 emitter.on('daily', (data) => {
@@ -33,7 +33,6 @@ emitter.on('daily', (data) => {
 });
 
 emitter.on('hourly', (data) => {
-    moduleLoader.runModules();
 });
 
 emitter.on('time_15', (event) => {
@@ -45,7 +44,7 @@ emitter.on('time_5', (event) => {
 });
 
 emitter.on('time_0', (event) => {
-    console.log('5 min');
+    console.log('0 min');
 });
 
 /*start modules on server start*/
