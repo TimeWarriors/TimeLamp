@@ -1,17 +1,14 @@
 [
     {
       "hashTag": "#!",
-      "functionToCall": "?",
       "priority": 3
     },
     {
       "hashTag": "#?",
-      "functionToCall": "?",
       "priority": 2
     },
     {
       "hashTag": "#I",
-      "functionToCall": "?",
       "priority": 1
     }
 ]

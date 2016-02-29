@@ -3,5 +3,8 @@
   "version": "1.0.0",
   "description": "Get Slack chatmessages and handle hashtags.",
   "main": "app.js",
-  "author": "Wictor Kihlbaum"
+  "author": "Wictor Kihlbaum",
+  "dependencies": {
+    "jsonfile": "^2.2.3"
+  }
 }
