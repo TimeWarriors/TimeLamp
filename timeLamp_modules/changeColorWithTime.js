@@ -17,41 +17,59 @@ const MyModule = class {
      * [module start function]
      */
     init(){
+
         co(function* (){
             this.removeNodeScheduleEvents(this.nodeSchedules);
 
             let settings = yield this.getSettings('hue');
             let moduleSettings = this.getModuleSettings(settings);
             let lampSettings = this.getLampSettings(settings);
-            let lampIds = this.getIdsFromLamps(lampSettings);
-            let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
+            let lampRoomIds = this.getRoomIdsFromLamps(lampSettings);
+            let lampHueIds = this.getHueLampId(lampSettings);
+            let roomSchedule = yield this.getTodaysRoomSchedule(lampRoomIds);
 
-            this.setDefaultColor(lampIds, moduleSettings);
-            return colorSchedule.getColorTimeSchedule(roomSchedule, moduleSettings);
+            this.setDefaultColor(lampHueIds, moduleSettings.roomAvalibleColor);
+            return colorSchedule.getColorTimeSchedule(roomSchedule, moduleSettings.preRoomBookingTimes, moduleSettings.roomAvalibleColor);
         }.bind(this))
             .then((colorTimeSchedule) => {
+                console.log(JSON.stringify(colorTimeSchedule, null, 2));
                 this.nodeSchedules = this.makeNodeSchedule(colorTimeSchedule);
+                console.log('done');
             })
             .catch((e) => {
-                throw e;
+                console.error(e.stack);
             });
     }
 
     /**
-     * [will call hue change color function]
+     * [will call hue change color functions, warning, fade and normal changes]
      * @param  {[type]} object []
      */
     changeColor(properties){
+        console.log('======!');
+        console.log(properties);
         this._.settings.getLampsinRoom(properties.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamps) => {
-                    if(properties.fade === false){
-                        if(properties.emit !== false){ this.emittTimes(properties); }
+                    if(properties.emit){ this.emittTimes(properties); }
+                    if(properties.pulse){
                         return this._.lightHandler.changeColorWithHue(lamps.lampId,
-                            properties.color, 0);
+                            properties.color, 0).then(() => {
+                                this._.lightHandler.setWarning(
+                                    lamps.lampId, 1000,
+                                    this.convertMinutesToSeconds(properties.timeDif),
+                                    properties.color
+                                );
+                            });
                     }
-                    return this._.lightHandler.changeColorWithHue(lamps.lampId,
-                        properties.color, this.convertMinutesToSeconds(properties.timeDif));
+                    return properties.fade ?
+                        this._.lightHandler.changeColorWithHue(lamps.lampId,
+                            properties.nextColor,
+                            this.convertMinutesToSeconds(properties.timeDif)
+                        ) :
+                        this._.lightHandler.changeColorWithHue(lamps.lampId,
+                            properties.color, 0);
+
                 });
             }).catch((er) => {
                 console.log(er);
@@ -74,13 +92,16 @@ const MyModule = class {
     makeNodeSchedule(roomColorTimeSchedule){
         return roomColorTimeSchedule.map((booking) => {
             return booking.colorSchedule.map((status) => {
+                console.log(status.time);
                 return this._.nodeSchedule.scheduleFunctionCallJob(
                     new Date(status.time),
                     this.changeColor.bind(this),{
                         color: status.color,
+                        nextColor: status.nextColor,
                         roomId: booking.roomId,
                         timeDif: status.timeDif,
                         fade: status.fade,
+                        pulse: status.pulse,
                         emit: status.emit
                     }
                 );
@@ -125,8 +146,12 @@ const MyModule = class {
      * @param  {[object]} lamps [collection of lamps]
      * @return {[object]}       [collection of Id's]
      */
-    getIdsFromLamps(lamps){
+    getRoomIdsFromLamps(lamps){
         return lamps.map(lamp => lamp.roomId);
+    }
+
+    getHueLampId(lamps){
+        return lamps.map(lamp => lamp.lampId);
     }
 
     getModuleSettings(settings){
@@ -151,10 +176,9 @@ const MyModule = class {
      * @param {[array]} lamps          [array of lamp objects]
      * @param {[object]} moduleSettings [settings object for this module]
      */
-    setDefaultColor(lampIds, moduleSettings){
+    setDefaultColor(lampIds, defaultColor){
         lampIds.forEach(lampId =>
-            this._.lightHandler.changeColor(lampId, moduleSettings.defaltColor[0],
-                moduleSettings.defaltColor[1], moduleSettings.defaltColor[2])
+            this._.lightHandler.changeColorWithHue(lampId, defaultColor, 0)
         );
     }
 };
