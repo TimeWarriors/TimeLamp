@@ -3,19 +3,22 @@ let LightHandler = require('./lightHandler.js');
 let lightHandler = new LightHandler();
 let assert = require('assert');
 
+//lightHandler.setWarning("2", 500, 5, 0)
 ////grön
 //lightHandler.changeColorWithHue("4", 25500, 1);
 ////röd
-//lightHandler.changeColorWithHue("3", 0, 1);
+//lightHandler.changeColorWithHue("3", 0, 0).then((res) => {
+//    console.log(JSON.parse(res));
+//})
 ////gul
 //lightHandler.changeColorWithHue("4", 20678, 1);
 ////orange
 //lightHandler.changeColorWithHue("3", 6375, 1);
-
-//lightHandler.changeColorWithHue("4", 0, 10);
-//setTimeout(function(){lightHandler.changeColorWithHue("3", 0, 3)}, 7000)
-
-
+//
+////lightHandler.changeColorWithHue("4", 0, 10);
+////setTimeout(function(){lightHandler.changeColorWithHue("3", 0, 3)}, 7000)
+//
+//
 describe('lightHandler.getHueLamps()', function() {
   var tests = [
     {expected: {},},
