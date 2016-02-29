@@ -1,186 +1,210 @@
 'use strict'
 let LightHandler = require('./lightHandler.js');
 let lightHandler = new LightHandler();
-let chalk = require('chalk');
+let assert = require('assert');
 
 
-////grön
-//lightHandler.changeColorWithHue("4", 25500, 1);
-////röd
-//lightHandler.changeColorWithHue("3", 0, 1);
-////gul
-//lightHandler.changeColorWithHue("4", 20678, 1);
-////orange
-//lightHandler.changeColorWithHue("3", 6375, 1);
+let testLamp = "3";
+describe('lightHandler.getHueLamps()', function() {
+  var tests = [
+    {expected: {},},
+  ];
 
-//lightHandler.changeColorWithHue("4", 0, 10);
-//setTimeout(function(){lightHandler.changeColorWithHue("3", 0, 3)}, 7000)
+  tests.forEach(function(test) {
+    it("gets the lamps", function() {
+        return lightHandler.getHueLamps.apply(null).then(function(res){
+            try
+            {
+                let obj = JSON.parse(res);
+                assert(typeof(obj) === typeof(test.expected), "Expected: "+typeof(test.expected)+" got: "+typeof(obj));
+            }
+            catch(e)
+            {
+                assert(false, "not valid json object. Got error: "+ e.message)   
+            }
+        })
+    });    
+  })      
+});
+ 
+describe('lightHandler.changeColorWithHue()', function() {
+    var testLampId = testLamp;
+    var tests = [
+      {args: [testLampId, 20678, 0], expected: true},
+      {args: [testLampId, 30000, 0], expected: true},
+      {args: [testLampId, 0, 0], expected: true},
+      {args: [testLampId, 193813209813, 0], expected: false},
+    ];   
 
-let lampToTest = "4";
-//lightHandler.setWarning("4", 500, 5, 0)
-
-testOn()
-.then(function(res){
-console.log(res);
-testchangeBrigthnessAndChangeColorWithHue()
-.then(function(res){
-console.log(res);
-testSaturation()
-.then(function(res){
-console.log(res);
-    
-})
-})
+    tests.forEach(function(test) {
+        it("Change hue to "+test.args[1], function(done) {
+                lightHandler.changeColorWithHue.apply(null, test.args).then((res) => {
+                try{
+                    
+                    let object = JSON.parse(res);
+                    let result;
+                    if(!object)
+                    {
+                        assert(false, "function does not return a valid JSON object");
+                    }
+                    else
+                    for(let i = 0; i < object.length; i++)
+                    {   
+                        if(object[i].error)
+                        {
+                            result = false;
+                            assert.equal(result, test.expected, "Failed to change hue to parameter: " + test.args[1])
+                            break;
+                        }
+                        else if(object[i].success)
+                        {
+                            result = true;
+                            assert.equal(result, test.expected, "Successfully changed hue to invalid parameter: " + test.args[1])
+                        }
+                        else
+                        {
+                            assert(false, "something unexpected went wrong in the function")
+                            break;
+                        }
+                    }
+                    done();
+                }
+                catch(e){
+                    return done(e);
+                }
+            }); 
+        });  
+    })
 });
 
-//Test 1 changeColorWithHue and changeBrightness
-function testchangeBrigthnessAndChangeColorWithHue(){
-    return new Promise((resolve, reject) => {
-        console.log("╔═══════════════════════════════════════╗");
-        console.log("║ changeColorWithHue & changeBrightness ║")
-        console.log("╚═══════════════════════════════════════╝");
-        let firstColor = 0;//0-65535
-        let secondColor = 25500;//0-65535
-        let firstBrightness = 0;//0-254
-        let secondBrightness= 254;//0-254
-        //change color and brightness
-        lightHandler.changeColorWithHue(lampToTest, firstColor, 0);
-        lightHandler.changeBrightness(lampToTest, firstBrightness, 0);
-        setTimeout(function(){
-             lightHandler.getHueLamps().then(function(res){
-                //FIRST RESULT
-                var object = JSON.parse(res);
-                console.log("changeColorWithHue test 1) expected result: " + firstColor + " actual result: " + object[lampToTest].state.hue)
-                console.log("changeBrightness test 1) expected result: " + firstBrightness + " actual result: " + object[lampToTest].state.bri)
-                //see if the color and brighness is what you wanted to change it to
-                if(firstColor === object[lampToTest].state.hue && firstBrightness === object[lampToTest].state.bri)
-                {
-                    //change color and brightness
-                    lightHandler.changeColorWithHue(lampToTest, secondColor, 0);
-                    lightHandler.changeBrightness(lampToTest, secondBrightness, 0);
-                    setTimeout(function(){
-                        lightHandler.getHueLamps().then(function(res){
-                        var object = JSON.parse(res);
-                        //SECOND RESULT
-                        console.log("changeColorWithHue test 2) expected result: " + secondColor + " actual result: " + object[lampToTest].state.hue);
-                        console.log("changeBrightness test 2) expected result: " + secondBrightness + " actual result: " + object[lampToTest].state.bri)
+describe('lightHandler.changeBrightness()', function() {
+    var testLampId = testLamp;
+    var tests = [
+      {args: [testLampId, 125, 0], expected: true},
+      {args: [testLampId, 0, 0], expected: true},
+      {args: [testLampId, 254, 0], expected: true},
+      {args: [testLampId, 2000, 0], expected: false},
+    ];   
 
-                        //FINAL RESULT
-                        if(secondColor === object[lampToTest].state.hue)//see if color was changed correctly
+    tests.forEach(function(test) {
+        it("Change brightness to "+test.args[1], function(done) {
+                lightHandler.changeBrightness.apply(null, test.args).then((res) => {
+                try{
+                    
+                    let object = JSON.parse(res);
+                    let result;
+                    if(!object)
+                    {
+                        assert(false, "function does not return a valid JSON object");
+                    }
+                    else
+                    for(let i = 0; i < object.length; i++)
+                    {   
+                        if(object[i].error)
                         {
-                            if(secondBrightness === object[lampToTest].state.bri)//see if brightness was changed correctly.
-                            {
-                                return resolve(chalk.green("changeBrightness & changeColorWithHue: the functions correctly changes brightness and color. Success!"))
-                            }
-                            else
-                            {
-                                return resolve(chalk.red("changeBrightness: the function incorrectly changes brightness. Fail!"))
-                            }
+                            result = false;
+                            assert.equal(result, test.expected, "Failed to change bri to parameter: " + test.args[1])
+                            break;
+                        }
+                        else if(object[i].success)
+                        {
+                            result = true;
+                            assert.equal(result, test.expected, "Successfully changed bri to invalid parameter: " + test.args[1])
                         }
                         else
                         {
-                            return resolve(chalk.red("changeColorWithHue: the function incorrectly changes color. Fail!"))
+                            assert(false, "something unexpected went wrong in the function")
+                            break;
                         }
-                    })
-                    },200)
-                }
-                else
-                {
-                    if(firstColor !== object[lampToTest].state.hue)
-                    {
-                        return resolve(chalk.red("changeColorWithHue: the function incorrectly changes color. Fail!"))
                     }
-                    if(firstBrightness === object[lampToTest].state.bri)
-                    {
-                        return resolve(chalk.red("changeBrightness: the function incorrectly changes brightness. Fail!"))
-                    }
+                    done();
                 }
-            });           
-        },200)
+                catch(e){
+                    return done(e);
+                }
+            }); 
+        });  
+    })      
+});
 
-    })
-
-}
-//Test 2 On
-function testOn(){
-  return new Promise((resolve, reject) => {
-    console.log("╔═══════════════════════════════════════╗");
-    console.log("║                  On                   ║");
-    console.log("╚═══════════════════════════════════════╝");
-    let firstStatus = false;
-    let secondStatus = true;
-    lightHandler.On(lampToTest, firstStatus);
-    setTimeout(function(){
-        lightHandler.getHueLamps().then(function(res){
-            let object = JSON.parse(res);
-            console.log("on test 1) expected result: " + firstStatus + " actual result: " + object[lampToTest].state.on)
-            if(object[lampToTest].state.on === firstStatus)
-            {
-                setTimeout(function(){
-                    lightHandler.On(lampToTest, secondStatus);
-                    lightHandler.getHueLamps().then(function(res){
-                        let object = JSON.parse(res);
-                        console.log("on test 2) expected result: " + secondStatus + " actual result: " + object[lampToTest].state.on)
-                        if(object[lampToTest].state.on === secondStatus)
-                        {          
-                            return resolve(chalk.green("On: turns the lamp on and off correctly. Success"))
+describe('lightHandler.changeSaturation()', function() {
+    var testLampId = testLamp;
+    var tests = [
+      {args: [testLampId, 2500, 0], expected: false},
+      {args: [testLampId, 0, 0], expected: true},
+      {args: [testLampId, 125, 0], expected: true},
+      {args: [testLampId, 254, 0], expected: true},
+    ];   
+    tests.forEach(function(test) {
+        it("Change saturation to "+test.args[1], function(done) {
+            lightHandler.changeSaturation.apply(null, test.args).then((res) => {
+                try{
+                    
+                    let object = JSON.parse(res);
+                    let result;
+                    if(!object)
+                    {
+                        assert(false, "function does not return a valid JSON object");
+                    }
+                    else
+                    for(let i = 0; i < object.length; i++)
+                    {   
+                        if(object[i].error)
+                        {
+                            result = false;
+                            assert.equal(result, test.expected, "Failed to change sat to parameter: " + test.args[1])
+                            break;
+                        }
+                        else if(object[i].success)
+                        {
+                            result = true;
+                            assert.equal(result, test.expected, "Successfully changed sat to invalid parameter: " + test.args[1])
                         }
                         else
                         {
-                            return resolve(chalk.red("On: does not turn on the lamp correctly. FAIL!"))
+                            assert(false, "something unexpected went wrong in the function")
+                            break;
                         }
-                    })
-                }, 200)
-            }                                    
-            else
-            {
-                return resolve(chalk.red("On: does not turn off the lamp correctly. FAIL!"))
-            }   
-        }) 
-    }, 200)
-   
- 
-  })
-}
-
-function testSaturation(){
-    return new Promise((resolve, reject) => {
-        console.log("╔═══════════════════════════════════════╗");
-        console.log("║            changeSaturation           ║");
-        console.log("╚═══════════════════════════════════════╝");
-        let firstSat = 100;
-        let secondSat = 254;
-        lightHandler.changeSaturation(lampToTest, firstSat, 0);
-        setTimeout(function(){
-            lightHandler.getHueLamps().then(function(res){
-                let object = JSON.parse(res);
-                console.log("changeSaturation test 1) expected result: " + firstSat + " actual result: " + object[lampToTest].state.sat);
-                if(object[lampToTest].state.sat === firstSat)
-                { 
-                    setTimeout(function(){
-                        lightHandler.changeSaturation(lampToTest, secondSat, 0)
-                        lightHandler.getHueLamps().then(function(res){
-                            let object = JSON.parse(res);
-                            console.log("changeSaturation test 2) expected result: " + secondSat + " actual result: " + object[lampToTest].state.sat);
-                            if(object[lampToTest].state.sat === secondSat)
-                            {
-                                return resolve(chalk.green("changeSaturation: successfully changes the saturation. Success!"));
-                            }
-                            else
-                            {
-                                 return resolve(chalk.red("changeSaturation: failed to change the saturation. FAIL!\nBecause of delays to the main hub this test may show the wrong result. Please try a couple of times to see if it's a consisten result or only happens once in a while"));
-                            }
-                        })    
-                    }, 300)        
+                    }
+                    done();
                 }
-                else
-                {
-                     return resolve(chalk.red("changeSaturation: failed to change the saturation. FAIL!"));
+                catch(e){
+                    return done(e);
                 }
-            });            
-        }, 200)
+            });
+  
+        });  
+    })      
+});
 
-    })
-}
-
-
+//////GAMMALT SOM KANSKE BEHÖVS OM DET FUCKAR I color testet senare
+//    var testLampId = testLamp;
+//    var tests = [
+//      {args: [testLampId, 20678, 0], expected: 20678},
+//      {args: [testLampId, 30000, 0], expected: 30000},
+//      {args: [testLampId, 0, 0], expected: 0},
+//    ];   
+//
+//    tests.forEach(function(test) {
+//        it("Change color to "+test.expected, function(done) {
+//            lightHandler.changeColorWithHue.apply(null, test.args).then(
+//            lightHandler.getHueLampById.call(null, testLampId).then(function(res){
+//                let hueColor = JSON.parse(res).state.hue;
+//                try{
+//                    if(hueColor == test.expected)
+//                    {
+//                        assert(true, "Expected: "+test.expected+" got: "+hueColor);
+//                    }
+//                    else
+//                    {
+//                        assert(false, "Expected: "+test.expected+" got: "+hueColor);
+//                    }
+//                    done();                    
+//                }
+//                catch(e){
+//                    return done(e);
+//                }
+//
+//            }))   
+//        });  
+//    }) 

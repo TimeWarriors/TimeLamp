@@ -49,82 +49,103 @@ LightHandler.prototype.getHueLampById = function(id){
 
 LightHandler.prototype.changeBrightness = function(lampId, brightness, secondsToChange)
 {
-    let bodyMessage = JSON.stringify({
-        "bri": brightness,
-        "transitiontime":secondsToChange*10 
+    return new Promise((resolve, reject) => {
+        let bodyMessage = JSON.stringify({
+            "bri": brightness,
+            "transitiontime":secondsToChange*10 
+        })
+        let headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': bodyMessage.length
+        };
+        let options = {
+            host: config.hueIp,
+            path: "/api/"+config.userName+"/lights/"+lampId+"/state",
+            method: 'PUT',
+            headers: headers
+        };
+        let req = http.request(options, (res) => {
+            let responseData = [];
+            res.on('data', (chunk) => {
+                responseData.push(chunk);
+            })
+            res.on('end', () => {
+                return resolve(Buffer.concat(responseData).toString())
+            })
+        })
+        req.on('error', (e) => {
+            reject("request failed with message: "+e.message);
+        })
+        req.write(bodyMessage);
+        req.end();
     })
-    let headers = {
-        'Content-Type': 'application/json',
-        'Content-Length': bodyMessage.length
-    };
-    let options = {
-        host: config.hueIp,
-        path: "/api/"+config.userName+"/lights/"+lampId+"/state",
-        method: 'PUT',
-        headers: headers
-    };
-    http.request(options).write(bodyMessage);
 }
 
 LightHandler.prototype.changeSaturation = function(lampId, saturation, secondsToChange)
 {
-    let bodyMessage = JSON.stringify({
-        "sat": saturation,
-        "transitiontime":secondsToChange*10 
+    return new Promise((resolve, reject) => {
+        let bodyMessage = JSON.stringify({
+            "sat": saturation,
+            "transitiontime":secondsToChange*10 
+        })
+        let headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': bodyMessage.length
+        };
+        let options = {
+            host: config.hueIp,
+            path: "/api/"+config.userName+"/lights/"+lampId+"/state",
+            method: 'PUT',
+            headers: headers
+        };
+        let req = http.request(options, (res) => {
+            let responseData = [];
+            res.on('data', (chunk) => {
+                responseData.push(chunk);
+            })
+            res.on('end', () => {
+                return resolve(Buffer.concat(responseData).toString())
+            })
+        })
+        req.on('error', (e) => {
+            reject("request failed with message: "+e.message);
+        })
+        req.write(bodyMessage);
+        req.end();
     })
-    let headers = {
-        'Content-Type': 'application/json',
-        'Content-Length': bodyMessage.length
-    };
-    let options = {
-        host: config.hueIp,
-        path: "/api/"+config.userName+"/lights/"+lampId+"/state",
-        method: 'PUT',
-        headers: headers
-    };
-    http.request(options).write(bodyMessage);
 }
 
-LightHandler.prototype.changeColor = function(lampId, r, g, b, secondsToChange){
-    secondsToChange = secondsToChange || 1;
-    //convert rgb to xy
-    let X = r * 0.664511 + g * 0.154324 + b * 0.162028;
-    let Y = r * 0.283881 + g * 0.668433 + b * 0.047685;
-    let Z = r * 0.000088 + g * 0.072310 + b * 0.986039;
-    let x = X / (X + Y + Z);
-    let y = Y / (X + Y + Z);
-    let bodyMessage = JSON.stringify({
-        "xy": [x,y],
-        "transitiontime":secondsToChange*10
-    })
-    let headers = {
-        'Content-Type': 'application/json',
-        'Content-Length': bodyMessage.length
-    };
-    let options = {
-        host: config.hueIp,
-        path: "/api/"+config.userName+"/lights/"+lampId+"/state",
-        method: 'PUT',
-        headers: headers
-    };
-    http.request(options).write(bodyMessage);
-    
-}
 LightHandler.prototype.On = function(lampId, status){
-    let bodyMessage = JSON.stringify({
-        "on": status     
+    return new Promise((resolve, reject) => {
+        let bodyMessage = JSON.stringify({
+            "on": status     
+        })
+        let headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': bodyMessage.length
+        };
+        let options = {
+            host: config.hueIp,
+            path: "/api/"+config.userName+"/lights/"+lampId+"/state",
+            method: 'PUT',
+            headers: headers
+        };
+        let req = http.request(options, (res) => {
+            let responseData = [];
+            res.on('data', (chunk) => {
+                responseData.push(chunk);
+            })
+            res.on('end', () => {
+                return resolve(Buffer.concat(responseData).toString())
+            })
+        })
+        req.on('error', (e) => {
+            reject("request failed with message: "+e.message);
+        })
+        req.write(bodyMessage);
+        req.end();
+        
     })
-    let headers = {
-        'Content-Type': 'application/json',
-        'Content-Length': bodyMessage.length
-    };
-    let options = {
-        host: config.hueIp,
-        path: "/api/"+config.userName+"/lights/"+lampId+"/state",
-        method: 'PUT',
-        headers: headers
-    };
-    http.request(options).write(bodyMessage);
 }
 //lampid, bool on, blinkrate ms(optional defaults to 1000)
 LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
@@ -151,41 +172,58 @@ LightHandler.prototype.toggleWarning = function(lampId, on, blinkrate){
 }
 
 LightHandler.prototype.setWarning = function(lampId, blinkrate, seconds, hue){
-    let self = this;
-    let newColor = hue;
-    let id = lampId;
-    let rate = blinkrate;
-    this.getHueLampById(lampId).then(function(res){    
-        let object = JSON.parse(res);
-        let initialColor = object.state.hue;
-        self.changeColorWithHue(id, newColor, 0);       
-        let interval = self.toggleWarning(id, true, rate);
-        setTimeout(function(){
-            self.changeColorWithHue(id, initialColor, 0);
-            self.toggleWarning(id, false);
-            clearInterval(interval);
-        }, seconds*1000);
+    return new Promise((resolve, reject) => {
+        let self = this;
+        let newColor = hue;
+        let id = lampId;
+        let rate = blinkrate;
+        this.getHueLampById(lampId).then(function(res){    
+            let object = JSON.parse(res);
+            let initialColor = object.state.hue;
+            self.changeColorWithHue(id, newColor, 0);       
+            let interval = self.toggleWarning(id, true, rate);
+            setTimeout(function(){
+                self.changeColorWithHue(id, initialColor, 0);
+                self.toggleWarning(id, false);
+                clearInterval(interval);
+                return resolve();
+            }, seconds*1000);
+        })
     })
-
 }
 
 LightHandler.prototype.changeColorWithHue = function(lampId, hue, secondsToChange)
 {
-    let bodyMessage = JSON.stringify({
-        "hue": hue,
-        "transitiontime":secondsToChange*10
+    return new Promise((resolve, reject) => {
+        let bodyMessage = JSON.stringify({
+            "hue": hue,
+            "transitiontime":secondsToChange*10
+        })
+        let headers = {
+            'Content-Type': 'application/json',
+            'Content-Length': bodyMessage.length
+        };
+        let options = {
+            host: config.hueIp,
+            path: "/api/"+config.userName+"/lights/"+lampId+"/state",
+            method: 'PUT',
+            headers: headers
+        };
+        let req = http.request(options, (res) => {
+            let responseData = [];
+            res.on('data', (chunk) => {
+                responseData.push(chunk);
+            })
+            res.on('end', () => {
+                return resolve(Buffer.concat(responseData).toString())
+            })
+        })
+        req.on('error', (e) => {
+            reject("request failed with message: "+e.message);
+        })
+        req.write(bodyMessage);
+        req.end();
     })
-    let headers = {
-        'Content-Type': 'application/json',
-        'Content-Length': bodyMessage.length
-    };
-    let options = {
-        host: config.hueIp,
-        path: "/api/"+config.userName+"/lights/"+lampId+"/state",
-        method: 'PUT',
-        headers: headers
-    };
-    http.request(options).write(bodyMessage);
 }
 
 module.exports = LightHandler;
