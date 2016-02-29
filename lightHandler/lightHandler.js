@@ -87,6 +87,7 @@ LightHandler.prototype.changeSaturation = function(lampId, saturation, secondsTo
     let req = http.request(options)
     req.write(bodyMessage);
     req.end();
+    
 }
 
 LightHandler.prototype.changeColor = function(lampId, r, g, b, secondsToChange){
