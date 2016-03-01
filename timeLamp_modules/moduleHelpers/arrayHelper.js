@@ -20,6 +20,10 @@ const ArrayHelper = class {
         return [].concat.apply([], array);
     }
 
+    mergeArrays(a, b){
+        return a.concat(b);
+    }
+
     /**
      * [removes null values from array's]
      */
