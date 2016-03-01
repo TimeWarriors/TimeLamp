@@ -1,6 +1,5 @@
 'use strict';
 
-
 const ColorSchedule = class {
     constructor() {
         this.dateHelper = require('./dateHelper.js');
@@ -13,26 +12,29 @@ const ColorSchedule = class {
         let sortedRoomBookingTimes = this.sortRoomBookingOnTime(roomBookingTimes);
         let maxTimeVal = this.getMaxTimeValue(sortedRoomBookingTimes);
 
-        let colorSchedule = roomSchedule.map((room) => {
-            // incomplete room object
-            if(!room[0].hasOwnProperty('booking')){ return null; }
-            return this.arrayHelper.isArrayLargerThanOne(room) ?
-                this.compareBookingTimes(
-                    room,
-                    maxTimeVal,
-                    sortedRoomBookingTimes) :
-                [this.buildSchedule(
-                    this.dateHelper.buildDateFromString(
-                        room[0].booking.time.startTime),
+        let validRoomSchedule = roomSchedule.filter(room =>
+            room[0].hasOwnProperty('booking'));
+
+        let singleBookings = validRoomSchedule.filter(room => !this.arrayHelper.isArrayLargerThanOne(room))
+            .map(room => {
+                return [this.buildSchedule(
+                    this.dateHelper.buildDateFromString(room[0].booking.time.startTime),
                     room[0].booking.id,
                     sortedRoomBookingTimes,
-                    this.dateHelper.buildDateFromString(
-                        room[0].booking.time.endTime)
+                    this.dateHelper.buildDateFromString(room[0].booking.time.endTime)
                 )];
-        });
+            });
+
+        let multibleBookings = validRoomSchedule.filter(room => this.arrayHelper.isArrayLargerThanOne(room))
+            .map(room =>
+                this.compareBookingTimes(room, maxTimeVal, sortedRoomBookingTimes));
+
         return this.arrayHelper.concatArray(
                 this.endTimeBuilder(
-                    this.arrayHelper.filterNull(colorSchedule), maxTimeVal, avalibleColor));
+                    this.arrayHelper.mergeArrays(
+                        multibleBookings, singleBookings),
+                    maxTimeVal, avalibleColor));
+
     }
 
     /**
