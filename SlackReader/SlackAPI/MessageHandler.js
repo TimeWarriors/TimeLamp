@@ -17,13 +17,16 @@ const MessageHandler = class {
     getMessages(channelID, lectureStartTime) {
         return new Promise((resolve, reject) => {
 
-            let path = '/api/channels.history' +
-                '?channel=' + channelID +
-                '&token=' + slackConfig.token +
-                '&pretty=1' +
-                '&oldest=' + lectureStartTime;
+            let path =
+                `/api/channels.history` +
+                `?channel=${channelID}` +
+                `&token=${slackConfig.token}` +
+                `&pretty=1` +
+                `&oldest=${lectureStartTime}`;
 
-            let timeWarriors = '/api/groups.history' +
+            // Test purpose.
+            let timeWarriors =
+                '/api/groups.history' +
                 '?token=xoxp-3143650568-3152373211-20195086247-e680271034' +
                 '&channel=G0JTV0Z2A&pretty=1' +
                 '&oldest=1456732800';
@@ -51,7 +54,6 @@ const MessageHandler = class {
                         };
                         messages.push(messageProps);
                     }
-                    console.log(messages);
                     return resolve(messages);
                 });
             }).on('error', error => {
@@ -80,19 +82,19 @@ const MessageHandler = class {
         return messages;
     }
 
-    sortOutHashTags(newMessages) {
-        let messages = [];
+    sortOutHashTags(messages) {
+        let sortedMessages = [];
 
-        for (let message of newMessages){
+        for (let message of messages){
             if (message.text.includes('#')) {
-                messages.push(message);
+                sortedMessages.push(message);
             }
         }
-        return messages;
+        return sortedMessages;
     }
 
     sortOutValidHashTags(messages) {
-        let validMessages = [];
+        let sortedMessages = [];
 
         for (let message of messages) {
             let messageProps = {
@@ -107,9 +109,10 @@ const MessageHandler = class {
                     messageProps.hashTags.push(validHashTag);
                 }
             }
-            validMessages.push(messageProps);
+            sortedMessages.push(messageProps);
         }
-        return validMessages;
+        console.log(sortedMessages);
+        return sortedMessages;
     }
 
     handleMessages(messages) {
@@ -121,7 +124,6 @@ const MessageHandler = class {
                     '#?': this.userHasQuestion,
                     '#I': this.postInfoToChannel
                 };
-
                 if (cases[hashTag]) {
                     cases[hashTag](message);
                 }
@@ -130,9 +132,10 @@ const MessageHandler = class {
     }
 
     streamProblem(message) {
-        console.log(message.user +
-            ' says there is a problem with the stream!');
+        console.log(`${message.user} reports stream problem!`);
+        // Test purpose.
         let lampID = '3';
+
 
         lightHandler.setWarning(
             lampID,
@@ -140,11 +143,14 @@ const MessageHandler = class {
             lampConfig.time,
             lampConfig.warningColor
         );
+
     }
 
     userHasQuestion(message) {
-        console.log(message.user + ' has a question!');
+        console.log(`${message.userhas} has a question!`);
+        // Test purpose.
         let lampID = '2';
+
 
         lightHandler.setWarning(
             lampID,
@@ -152,21 +158,17 @@ const MessageHandler = class {
             lampConfig.time,
             lampConfig.questionColor
         );
+
         // TODO: Post message to screen.
     }
 
     postInfoToChannel() {
-        // TODO: See if message can be sent to only user.
-
-        let postPath = '/api/chat.postMessage' +
-            '?token=xoxp-3143650568-3152373211-20195086247-e680271034' +
-            '&channel=G0JTV0Z2A' +
-            '&text=Hejsan' +
-            '&username=KioskBot';
+        // Test purpose.
+        let timeWarriors = '/api/chat.postMessage?token=xoxp-3143650568-3152373211-20195086247-e680271034&channel=G0JTV0Z2A&text=Vadvilldu&username=Steeve';
 
         let options = {
             hostname: slackConfig.hostName,
-            path: postPath,
+            path: timeWarriors,
             method: 'POST'
         };
 
@@ -176,6 +178,7 @@ const MessageHandler = class {
         }).on('error', error => {
             console.log(error);
         }).end();
+
     }
 };
 

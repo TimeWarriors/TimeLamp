@@ -5,6 +5,7 @@
   "main": "app.js",
   "author": "Wictor Kihlbaum",
   "dependencies": {
-    "jsonfile": "^2.2.3"
+    "jsonfile": "^2.2.3",
+    "websocket": "^1.0.22"
   }
 }

@@ -2,15 +2,20 @@
 
 const ChannelHandler = require('./ChannelHandler.js');
 const MessageHandler = require('./MessageHandler.js');
+const WebSocketHandler = require('./WebSocketHandler.js');
+const slackConfig = require('../slackConfig.json');
+const https = require('https');
 const channelsFile = './channels.json';
 const Jsonfile = require('jsonfile');
 Jsonfile.spaces = 4;
+const WebSocketClient = require('websocket').client;
 
 
 const SlackAPI = class {
     constructor() {
         this.channelHandler = new ChannelHandler();
         this.messageHandler = new MessageHandler();
+        this.webSocketHandler = new WebSocketHandler();
         this.channels = Jsonfile.readFileSync(channelsFile);
     }
 
@@ -30,14 +35,22 @@ const SlackAPI = class {
             });
     }
 
+    initWebSocket() {
+        this.webSocketHandler.getWebSocketURL()
+            .then(url => {
+                this.webSocketHandler.connectToWebSocket(url);
+            })
+            .catch(error => {
+                console.log(error);
+            });
+    }
+
+    /*
     getMessages(courseCode, lectureStartTime) {
-        // Test purpose.
-        let postedMessages = 0;
         let channelID = this.getChannelID(this.channels, courseCode);
 
         this.messageHandler.getMessages(channelID, lectureStartTime)
             .then(messages => {
-
                 if (this.messageHandler.isNewMessagePosted(messages)) {
                     messages = this.messageHandler.sortOutMessages(messages);
                     this.messageHandler.handleMessages(messages);
@@ -49,7 +62,9 @@ const SlackAPI = class {
                 console.log(error);
             });
     }
+    */
 
+    /*
     getChannelID(channels, courseCode) {
         for (let channel of channels) {
             if (courseCode.includes(channel.courseCode)) {
@@ -57,8 +72,10 @@ const SlackAPI = class {
             }
         }
     }
+    */
 
     convertToMilliseconds(time) {
+        // (time format = 'xx:xx')
         let today = new Date();
         today.setHours(time.substring(0, 2));
         today.setMinutes(time.substring(3, 5));
@@ -66,6 +83,7 @@ const SlackAPI = class {
         time = +today; // '+' Converts to milliseconds.
         return time;
     }
+
 };
 
 module.exports = SlackAPI;
