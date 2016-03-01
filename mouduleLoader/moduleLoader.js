@@ -9,6 +9,7 @@ const ModuleLoader = class {
 
     requireModules(){
         this.timeLampModules.push(
+            require('../timeLamp_modules/saturationStartChange.js').run(this._),
             require('../timeLamp_modules/changeColorWithTime.js').run(this._)
         );
     }

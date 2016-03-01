@@ -42,7 +42,7 @@ const MyModule = class {
     }
 
     /**
-     * [will call hue change color function]
+     * [will call hue change color functions, warning, fade and normal changes]
      * @param  {[type]} object []
      */
     changeColor(properties){
@@ -53,13 +53,15 @@ const MyModule = class {
                 lampsInRoom.forEach((lamps) => {
                     if(properties.emit){ this.emittTimes(properties); }
                     if(properties.pulse){
-                        return this._.lightHandler.setWarning(
-                                lamps.lampId, 10,
-                                this.convertMinutesToSeconds(properties.timeDif),
-                                properties.color
-                            );
+                        return this._.lightHandler.changeColorWithHue(lamps.lampId,
+                            properties.color, 0).then(() => {
+                                this._.lightHandler.setWarning(
+                                    lamps.lampId, 1000,
+                                    this.convertMinutesToSeconds(properties.timeDif),
+                                    properties.color
+                                );
+                            });
                     }
-
                     return properties.fade ?
                         this._.lightHandler.changeColorWithHue(lamps.lampId,
                             properties.nextColor,
@@ -67,6 +69,7 @@ const MyModule = class {
                         ) :
                         this._.lightHandler.changeColorWithHue(lamps.lampId,
                             properties.color, 0);
+
                 });
             }).catch((er) => {
                 console.log(er);
@@ -164,39 +167,8 @@ const MyModule = class {
      * @return {[object]} [room schedule]
      */
     getTodaysRoomSchedule(ids){
-        return [
-                    [
-
-                    {
-                      "booking": {
-                        "time": {
-                          "endDate": "2016-02-11",
-                          "endTime": "19:00",
-                          "startDate": "2016-02-11",
-                          "startTime": "17:42"
-                        },
-                        "id": "ny105",
-                        "bookingId": "309122",
-                        "columns": [
-                          "1MP104, MGJOM15h",
-                          "VT16-R0832, HT15-51017",
-                          "Ny167K",
-                          "",
-                          "JOM15A",
-                          "Lektion",
-                          "1MP104 TV/Video I - Gestaltande produktion",
-                          "",
-                          ""
-                        ]
-                      }
-                    }
-
-                ]
-            ];
-
-
-        /*return Promise.all(ids.map(id =>
-            this.timeEdidApiLnu.getTodaysSchedule(id)));*/
+        return Promise.all(ids.map(id =>
+            this.timeEdidApiLnu.getTodaysSchedule(id)));
     }
 
     /**
