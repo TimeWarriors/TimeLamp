@@ -7,10 +7,12 @@ const ColorSchedule = class {
         const C = require('../../colorTimeConverter/colorTimeConverter.js');
         this.colorTimeConverter = new C();
         this.roomOccupiedColor = false;
+        this.avalibleColor = false;
     }
 
     getColorTimeSchedule(roomSchedule, roomBookingTimes, avalibleColor, roomOccupiedColor){
         this.roomOccupiedColor = roomOccupiedColor;
+        this.avalibleColor = avalibleColor;
         let sortedRoomBookingTimes = this.sortRoomBookingOnTime(roomBookingTimes);
         let maxTimeVal = this.getMaxTimeValue(sortedRoomBookingTimes);
         // valid rooms
@@ -53,7 +55,7 @@ const ColorSchedule = class {
             roomId: id,
             startTime: time,
             endTime: endTime,
-            startColor: this.roomOccupiedColor
+            startColor: this.avalibleColor
         };
     }
 
