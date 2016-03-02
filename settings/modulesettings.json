@@ -1,4 +1,5 @@
 {
+    "roomOccupiedColor": 0,
     "roomAvalibleColor": 25500,
     "preRoomBookingTimes" : [
         {
