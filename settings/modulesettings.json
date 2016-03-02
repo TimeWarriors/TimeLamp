@@ -1,31 +1,44 @@
-[
-    {
-        "time": 120,
-        "color": 25500,
-        "fade": true
-    },
+{
+    "roomAvalibleColor": 25500,
+    "preRoomBookingTimes" : [
+        {
+            "time": 120,
+            "color": 25500,
+            "fade": true,
+            "pulse": false,
+            "emit": false
+        },
 
-    {
-        "time": 60,
-        "color": 20678,
-        "fade": true
-    },
+        {
+            "time": 60,
+            "color": 20678,
+            "fade": true,
+            "pulse": false,
+            "emit": false
+        },
 
-    {
-        "time": 15,
-        "color":6375,
-        "fade": false
-    },
+        {
+            "time": 15,
+            "color":6375,
+            "fade": false,
+            "pulse": false,
+            "emit": true
+        },
 
-    {
-        "time": 5,
-        "color": 0,
-        "fade": false
-    },
+        {
+            "time": 5,
+            "color": 0,
+            "fade": false,
+            "pulse": true,
+            "emit": true
+        },
 
-    {
-        "time": 0,
-        "color": 0,
-        "fade": false
-    }
-]
+        {
+            "time": 0,
+            "color": 0,
+            "fade": false,
+            "pulse": false,
+            "emit": true
+        }
+    ]
+}

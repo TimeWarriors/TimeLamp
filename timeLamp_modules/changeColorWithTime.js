@@ -11,46 +11,65 @@ const MyModule = class {
                 'https://se.timeedit.net/web/lnu/db1/schema1/',
                 4
             );
-
     }
 
     /**
      * [module start function]
      */
     init(){
+
         co(function* (){
             this.removeNodeScheduleEvents(this.nodeSchedules);
 
             let settings = yield this.getSettings('hue');
             let moduleSettings = this.getModuleSettings(settings);
             let lampSettings = this.getLampSettings(settings);
-            let lampIds = this.getIdsFromLamps(lampSettings);
-            let roomSchedule = yield this.getTodaysRoomSchedule(lampIds);
+            let lampRoomIds = this.getRoomIdsFromLamps(lampSettings);
+            let lampHueIds = this.getHueLampId(lampSettings);
+            let roomSchedule = yield this.getTodaysRoomSchedule(lampRoomIds);
 
-            this.setDefaultColor(lampIds, moduleSettings);
-            return colorSchedule.getColorSchedule(roomSchedule, moduleSettings);
+            this.setDefaultColor(lampHueIds, moduleSettings.roomAvalibleColor);
+            return colorSchedule.getColorTimeSchedule(roomSchedule, moduleSettings.preRoomBookingTimes, moduleSettings.roomAvalibleColor);
         }.bind(this))
-            .then((colorSchedule) => {
-                this.nodeSchedules = this.makeNodeSchedule(colorSchedule);
+            .then((colorTimeSchedule) => {
+                console.log(JSON.stringify(colorTimeSchedule, null, 2));
+                this.nodeSchedules = this.makeNodeSchedule(colorTimeSchedule);
+                console.log('done');
             })
             .catch((e) => {
-                throw e;
+                console.error(e.stack);
             });
     }
 
     /**
-     * [will call hue change color function]
+     * [will call hue change color functions, warning, fade and normal changes]
      * @param  {[type]} object []
      */
     changeColor(properties){
+        console.log('======!');
+        console.log(properties);
         this._.settings.getLampsinRoom(properties.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamps) => {
-                    if(properties.fade === false){
-                        if(properties.emit !== false){ this.emittTimes(properties); }
-                        return this._.lightHandler.changeColorWithHue(lamps.lampId, properties.color, 0);
+                    if(properties.emit){ this.emittTimes(properties); }
+                    if(properties.pulse){
+                        return this._.lightHandler.changeColorWithHue(lamps.lampId,
+                            properties.color, 0).then(() => {
+                                this._.lightHandler.setWarning(
+                                    lamps.lampId, 1000,
+                                    this.convertMinutesToSeconds(properties.timeDif),
+                                    properties.color
+                                );
+                            });
                     }
-                    return this._.lightHandler.changeColorWithHue(lamps.lampId, properties.color, (properties.timeDif*60));
+                    return properties.fade ?
+                        this._.lightHandler.changeColorWithHue(lamps.lampId,
+                            properties.nextColor,
+                            this.convertMinutesToSeconds(properties.timeDif)
+                        ) :
+                        this._.lightHandler.changeColorWithHue(lamps.lampId,
+                            properties.color, 0);
+
                 });
             }).catch((er) => {
                 console.log(er);
@@ -61,19 +80,30 @@ const MyModule = class {
         this._.emitter.emit(properties.emit, properties);
     }
 
+    convertMinutesToSeconds(time){
+        return time*60;
+    }
+
     /**
      * [will book node schedules to run function at specific time]
      * @param  {[array]} roomSchedule [contains times to book node schedule on]
      * @return {[object]}       [node schedule events]
      */
-    makeNodeSchedule(roomColorSchedule){
-        return roomColorSchedule.map((booking) => {
+    makeNodeSchedule(roomColorTimeSchedule){
+        return roomColorTimeSchedule.map((booking) => {
             return booking.colorSchedule.map((status) => {
+                console.log(status.time);
                 return this._.nodeSchedule.scheduleFunctionCallJob(
                     new Date(status.time),
-                    this.changeColor.bind(this),
-                    { color: status.color, roomId: booking.roomId,
-                        timeDif: status.timeDif, fade: status.fade, emit: status.emit }
+                    this.changeColor.bind(this),{
+                        color: status.color,
+                        nextColor: status.nextColor,
+                        roomId: booking.roomId,
+                        timeDif: status.timeDif,
+                        fade: status.fade,
+                        pulse: status.pulse,
+                        emit: status.emit
+                    }
                 );
             });
         });
@@ -116,8 +146,12 @@ const MyModule = class {
      * @param  {[object]} lamps [collection of lamps]
      * @return {[object]}       [collection of Id's]
      */
-    getIdsFromLamps(lamps){
+    getRoomIdsFromLamps(lamps){
         return lamps.map(lamp => lamp.roomId);
+    }
+
+    getHueLampId(lamps){
+        return lamps.map(lamp => lamp.lampId);
     }
 
     getModuleSettings(settings){
@@ -142,10 +176,9 @@ const MyModule = class {
      * @param {[array]} lamps          [array of lamp objects]
      * @param {[object]} moduleSettings [settings object for this module]
      */
-    setDefaultColor(lampIds, moduleSettings){
+    setDefaultColor(lampIds, defaultColor){
         lampIds.forEach(lampId =>
-            this._.lightHandler.changeColor(lampId, moduleSettings.defaltColor[0],
-                moduleSettings.defaltColor[1], moduleSettings.defaltColor[2])
+            this._.lightHandler.changeColorWithHue(lampId, defaultColor, 0)
         );
     }
 };
