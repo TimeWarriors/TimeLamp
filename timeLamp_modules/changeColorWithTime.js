@@ -17,7 +17,6 @@ const MyModule = class {
      * [module start function]
      */
     init(){
-
         co(function* (){
             this.removeNodeScheduleEvents(this.nodeSchedules);
 
@@ -53,8 +52,6 @@ const MyModule = class {
      * @param  {[type]} object []
      */
     changeColor(properties){
-        console.log('======!');
-        console.log(properties);
         if(properties.emit){ this.emittTimes(properties); }
         this._.settings.getLampsinRoom(properties.roomId)
             .then((lampsInRoom) => {
@@ -102,7 +99,6 @@ const MyModule = class {
     makeNodeSchedule(roomColorTimeSchedule){
         return roomColorTimeSchedule.map((booking) => {
             return booking.colorSchedule.map((status) => {
-                console.log(status.time);
                 return this._.nodeSchedule.scheduleFunctionCallJob(
                     new Date(status.time),
                     this.changeColor.bind(this),{
