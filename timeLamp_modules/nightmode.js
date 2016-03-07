@@ -5,6 +5,7 @@ const arrayHelper = require('./moduleHelpers/arrayHelper.js');
 const Nightmode = class {
     constructor(functionLayer) {
         this._ = functionLayer;
+        this.nodeSchedules = [];
         this.settingsModule = require('../settings/modulesettings.js');
         this.timeEdidApiLnu = new this._.TimeeditDAL(
             'https://se.timeedit.net/web/lnu/db1/schema1/',
@@ -12,6 +13,9 @@ const Nightmode = class {
         );
     }
 
+    /**
+     * [module startFunctions]
+     */
     init(){
         co(function* (){
             let settings = yield this.getSettings('hue');
@@ -28,16 +32,21 @@ const Nightmode = class {
                 return this.getNightmodePosible(bookings);
             }).then((roomIds) => {
                 console.log(roomIds);
-                this.makeNodeSchedule(roomIds, this.nightmodeStartTime, this.nightmodeColor, 0);
-                this.makeNodeSchedule(roomIds, this.nightmodeEndTime, this.defaultColor, 254);
+                this.nodeSchedules.push(
+                    this.makeNodeSchedule(roomIds, this.nightmodeStartTime, this.nightmodeColor, 0));
+                this.nodeSchedules.push(
+                    this.makeNodeSchedule(roomIds, this.nightmodeEndTime, this.defaultColor, 254));
             }).catch((er) => {
                 console.log(er);
             });
     }
 
+    /**
+     * [changes color of lamps]
+     * @param  {[object]} props [properties for lamps]
+     * @return {[type]}       [description]
+     */
     runNightmode(props){
-        console.log('hej');
-        console.log(props);
         this._.settings.getLampsinRoom(props.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamp) => {
@@ -48,6 +57,14 @@ const Nightmode = class {
             });
     }
 
+    /**
+     * [builds node schedule]
+     * @param  {[array]} roomIds  [array of roomIds]
+     * @param  {[date]} time      [date object]
+     * @param  {[int]} color      [color in hue]
+     * @param  {[int]} brightness [brightness of lamp]
+     * @return {[array]}          [array of nodeschedule events]
+     */
     makeNodeSchedule(roomIds, time, color, brightness){
         return roomIds.map(room => {
             return this._.nodeSchedule.scheduleFunctionCallJob(
@@ -134,6 +151,11 @@ const Nightmode = class {
         return lamps.map(lamp => lamp.lampId);
     }
 
+    /**
+     * [fetches all settings]
+     * @param  {[array]} ids [roomIds in array]
+     * @return {[promise]}     [promise of settings objects]
+     */
     getTodaysRoomSchedule(ids){
         return Promise.all(ids.map(id =>
             this.timeEdidApiLnu.getTodaysSchedule(id)));
