@@ -1,71 +1,55 @@
-settings.json
 
- Innehåller alla lampor som objekt och kan få in en ny lampa när som helst.
-För att lägga till en ny lampa skapa ett objekt i arrayn. Exempel på lampor är
-blink och hue.
+### lampSettings.json
 
-                Exempel:
-                        [
-                            {
-                                "type": "blink",
-                                "id": "Lägg till id på lampan"
-                            },
+This file contains proporties for lamps.
 
-                            {
-                                "type": "hue",
-                                "id": "Lägg till id på lampan",
-                                "room": "Lägg till id på rum"
-                            }
-                        ]
+** Example **
+```JSON
+[
+    {
+        "type": "hue", // type of lamp
+        "lampId": "XX", // id of hue lamp
+        "roomId": "ny105" // id of which room lamp is in
+    }
+]
+```
 
+### modulesettings.json
 
-settings.js   
+This file contains proporties for nightmode and lamp color options.
 
-Scriptet innehåller en JSON parser funktion som läser av settings.json filen.
-Scriptet innehåller även tre funktioner som är GETS till Lampor.
+* In preRoomBookingTimes you can add an object that controls color of lamps on a specific time before a booking.
 
-getLamps(type)  
+* If the emit proporty in preRooBookingTimes objects is true it will emit on the time value plus a string named "time"  ex  *"time_120"*
 
-Denna funktionen tar in en type som kan vara blink eller hue.
-Tar funktionen in något annat kommer den kasta felmedelande att
-den inte kunde hitta typen.
+** Example **
+```JSON
+{
+    "nightMode": { // nightmode props.
+        "startColor": 46920,
+        "endColor": 25500,
+        "startTime": "20:00",
+        "endTime": "04:00" // this time is always the day after startTime.
+    },
+    "roomOccupiedColor": 0, // hue color when a room is booked.
+    "roomAvalibleColor": 25500, // hue color when a room is avalible.
+    "preRoomBookingTimes" : [
+        {
+            "time": 120, // time in minutes, minutes before booking.
+            "color": 25500, // start color when clock is time before booking.
+            "fade": true, // if it should fade or note.
+            "pulse": false, // if it sould pulse or note.
+            "emit": false // if it should send out a node EventEmitter or not.
+        },
 
-Om man skickar in en valid typ så får man tilbaka alla lampor
-som är av den här typen.
-
-getLampsinRoom(roomId)
-
-Denna funktionen tarin et rumId som kan vara vad som helst.
-I testkoden används idt 105. Om ett id inte existerar så får
-man tillbaka ett error som säger att rummet inte existerar.
-
-Om man skickar in ett valit rumId så får man tillbaka alla lampor
-som existerar i detta rum.
-
-getIdOnLamps(lampId)    
-
-Denna funktionen tar in en type som kan avra vad som helst.
-I testkoden används idt XXX. Om ett id inte existerar så får
-man tillbaka ett error som säger att lampan inte existerar.
-
-Om man skickar in ett valit rumId så får man tillbaka alla lampor
-som existerar på detta id.
-
-
-modulesettings.json
-
-Detta är en json fil som innehåller all information till modulerna och är satt till färgerna red, orange och green.
-De kan ändras i filen när man vill beroende på vilka färger man vill att lampan ska ha.
-Filen har även en tid satt till 30 som berättar för lampan när den ska vara orange.
-
-
-modulesettings.js
-
-Detta script är gjort för att retunera en parsad fil med all information om lampan till modulen/modulerna.
-Den fungrar enkelt med en funktion som parsar json filen och en funtion som retunerar den.
-
-Funktionen parsar filen.
-parsedFile();
-
-Funktionen retunerar den parsade filens värden.
-getModuleSettings();
+        // "time": 0, object should always be there, do it runs on booking start.
+        {
+            "time": 0,
+            "color": 0,
+            "fade": false,
+            "pulse": false,
+            "emit": true
+        }
+    ]
+}
+```
