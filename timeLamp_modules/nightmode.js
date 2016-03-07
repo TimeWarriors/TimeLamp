@@ -1,47 +1,71 @@
 'use strict';
 const co = require('co');
-
+const dateHelper = require('./moduleHelpers/dateHelper.js');
+const arrayHelper = require('./moduleHelpers/arrayHelper.js');
 const Nightmode = class {
     constructor(functionLayer) {
-
         this._ = functionLayer;
-        this.dateHelper = require('./moduleHelpers/dateHelper.js');
-        this.arrayHelper = require('./moduleHelpers/arrayHelper.js');
+        this.nodeSchedules = [];
+        this.settingsModule = require('../settings/modulesettings.js');
         this.timeEdidApiLnu = new this._.TimeeditDAL(
             'https://se.timeedit.net/web/lnu/db1/schema1/',
             4
         );
-        this.nightmodeStartTime = this.dateHelper.buildDateFromString('21:00'); // TODO: get this from some settings file
-        this.nightmodeEndTime = this.dateHelper.addDayToDate(1,
-            this.dateHelper.buildDateFromString('04:00')); // TODO: get this from some settings file
-
-        this.nightmodeColor = 46920; // TODO: get this from some settings file
-        this.defaultColor = 25500;
     }
 
+    /**
+     * [module startFunctions]
+     */
     init(){
         co(function* (){
-            let lampSettings = yield this.getLampSettings('hue');
+            this.removeNodeScheduleEvents(this.nodeSchedules);
+
+            let settings = yield this.getSettings('hue');
+            let lampSettings = this.getLampSettings(settings);
             let lampRoomIds = this.getRoomIdsFromLamps(lampSettings);
             let lampHueIds = this.getHueLampId(lampSettings);
+            let moduleSettings = this.getModuleSettings(settings);
+            this.setModuleVariables(moduleSettings);
             let roomSchedule = yield this.getTodaysRoomSchedule(lampRoomIds);
 
-            return this.arrayHelper.concatArray(roomSchedule);
+            return arrayHelper.concatArray(roomSchedule);
         }.bind(this))
             .then((bookings) => {
                 return this.getNightmodePosible(bookings);
             }).then((roomIds) => {
                 console.log(roomIds);
-                this.makeNodeSchedule(roomIds, this.nightmodeStartTime, this.nightmodeColor, 0);
-                this.makeNodeSchedule(roomIds, this.nightmodeEndTime, this.defaultColor, 254);
+                this.nodeSchedules.push(
+                    this.makeNodeSchedule(roomIds, this.nightmodeStartTime, this.nightmodeColor, 0));
+                this.nodeSchedules.push(
+                    this.makeNodeSchedule(roomIds, this.nightmodeEndTime, this.defaultColor, 254));
             }).catch((er) => {
                 console.log(er);
             });
     }
 
+    /**
+     * [removes old node schedule events]
+     * @param  {[array]} nodeScheduleEvents [array of nodeschedules]
+     */
+    removeNodeScheduleEvents(nodeScheduleEvents){
+        nodeScheduleEvents.forEach((jobCollections) => {
+            try {
+                jobCollections.forEach((job) => {
+                    try {
+                        job.cancel();
+                    } catch (e) {}
+                });
+            } catch (e) {}
+        });
+        this.nodeSchedules = [];
+    }
+
+    /**
+     * [changes color of lamps]
+     * @param  {[object]} props [properties for lamps]
+     * @return {[type]}       [description]
+     */
     runNightmode(props){
-        console.log('hej');
-        console.log(props);
         this._.settings.getLampsinRoom(props.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamp) => {
@@ -52,6 +76,14 @@ const Nightmode = class {
             });
     }
 
+    /**
+     * [builds node schedule]
+     * @param  {[array]} roomIds  [array of roomIds]
+     * @param  {[date]} time      [date object]
+     * @param  {[int]} color      [color in hue]
+     * @param  {[int]} brightness [brightness of lamp]
+     * @return {[array]}          [array of nodeschedule events]
+     */
     makeNodeSchedule(roomIds, time, color, brightness){
         return roomIds.map(room => {
             return this._.nodeSchedule.scheduleFunctionCallJob(
@@ -65,16 +97,23 @@ const Nightmode = class {
         });
     }
 
-    getNightmodePosible(bookings, nightmodeStartTime){
+    /**
+     * [gets rooms ids of avaible rooms ]
+     * @param  {[type]} bookings           [description]
+     * @return {[array]}                    [array of roomIds]
+     */
+    getNightmodePosible(bookings){
         let mySet = new Set();
         let univibleRoomIds = bookings.filter(item => item.hasOwnProperty('booking'))
             .filter(item =>
-                !this.isNightmodePosible(this.dateHelper.buildDateFromString(item.booking.time.endTime)))
+                !this.isNightmodeStartPosible(
+                    dateHelper.buildDateFromString(item.booking.time.endTime)))
             .map(item => item.booking.id);
 
         let bookedRooms = bookings.filter(item => item.hasOwnProperty('booking'))
             .filter(item =>
-                this.isNightmodePosible(this.dateHelper.buildDateFromString(item.booking.time.endTime)))
+                this.isNightmodeStartPosible(
+                    dateHelper.buildDateFromString(item.booking.time.endTime)))
             .filter(item => univibleRoomIds.indexOf(item.booking.id))
             .filter(item => {
                 if(mySet.has(item.id)){ return false; }
@@ -83,17 +122,44 @@ const Nightmode = class {
             .map(item => { return { id:item.booking.id}; });
 
         let unBookedRooms = bookings.filter(item => !item.hasOwnProperty('booking'));
-        return this.arrayHelper.mergeArrays(bookedRooms, unBookedRooms);
+        return arrayHelper.mergeArrays(bookedRooms, unBookedRooms);
     }
 
-    isNightmodePosible(bookingEndTime){
+    isNightmodeStartPosible(bookingEndTime, bookingStartTime){
         return bookingEndTime <= this.nightmodeStartTime;
     }
 
-    getLampSettings(lampType){
-        return new Promise((resolve, reject) => {
-            resolve(this._.settings.getLamps(lampType));
-        });
+    /**
+     * [sets nightmode variables global to this class]
+     * @param {[object]} nightModeSettings [nightmode settings part of moduleSettings]
+     */
+    setModuleVariables(nightModeSettings){
+        this.nightmodeStartTime = dateHelper.buildDateFromString(nightModeSettings.startTime);
+        this.nightmodeEndTime = dateHelper.addDayToDate(1,
+            dateHelper.buildDateFromString(nightModeSettings.endTime));
+
+        this.nightmodeColor = nightModeSettings.startColor;
+        this.defaultColor = nightModeSettings.endColor;
+    }
+
+    /**
+     * [returns settings for module and lamp]
+     * @param  {[string]} lampType [type of lamp]
+     * @return {[promise]}         [promise of all settings]
+     */
+    getSettings(lampType){
+        return Promise.all([
+            this._.settings.getLamps(lampType),
+            this.settingsModule.getModuleSettings(),
+        ]);
+    }
+
+    getModuleSettings(settings){
+        return settings[1].nightMode;
+    }
+
+    getLampSettings(array){
+        return array[0];
     }
 
     getRoomIdsFromLamps(lamps){
@@ -104,6 +170,11 @@ const Nightmode = class {
         return lamps.map(lamp => lamp.lampId);
     }
 
+    /**
+     * [fetches all settings]
+     * @param  {[array]} ids [roomIds in array]
+     * @return {[promise]}     [promise of settings objects]
+     */
     getTodaysRoomSchedule(ids){
         return Promise.all(ids.map(id =>
             this.timeEdidApiLnu.getTodaysSchedule(id)));
@@ -113,6 +184,3 @@ const Nightmode = class {
 exports.run = function(functionLayer){
     return new Nightmode(functionLayer);
 };
-
-
-// 46920
