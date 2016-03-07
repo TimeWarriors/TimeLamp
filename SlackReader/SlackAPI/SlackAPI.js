@@ -13,12 +13,12 @@ const Jsonfile = require('jsonfile');
 
 const SlackAPI = class {
 
-    constructor() {
+    constructor(eventEmitter) {
         this.userHandler = new UserHandler();
         this.channelHandler = new ChannelHandler();
-        this.webSocketHandler = new WebSocketHandler();
+        this.webSocketHandler = new WebSocketHandler(eventEmitter);
         this.channels = Jsonfile.readFileSync(channelsFile);
-        //this.startUp();
+        this.startUp();
     }
 
     /**
@@ -60,6 +60,8 @@ const SlackAPI = class {
                 const allChannels = await (this.channelHandler.getAllChannels());
                 let channels = this.channelHandler.getChannels(allChannels);
                 channels = await (this.channelHandler.getScheduleForChannels(channels));
+                // TODO: lös detta
+                //channels = await (this.channelHandler.getLampIDForChannels(channels));
                 this.channelHandler.saveChannels(channels);
             } catch (error) {
                 console.log(error);

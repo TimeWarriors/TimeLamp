@@ -13,7 +13,8 @@ const usersFile = require('../users.json');
 
 const MessageHandler = class {
 
-    constructor() {
+    constructor(eventEmitter) {
+        this.eventEmitter = eventEmitter;
         this.lightHandler = new LightHandler();
         this.coolDownCounter = 0;
     }
@@ -31,6 +32,7 @@ const MessageHandler = class {
             msg.hasOwnProperty('text') &&
             msg.text.includes('#')) {
 
+            // TODO: Uncomment for live-filtering!
             //if (this.isLectureLive(msg)) {
                 msg = this.sortValidHashTags(msg);
                 if (msg.hasOwnProperty('hashTags'))
@@ -103,10 +105,10 @@ const MessageHandler = class {
                 validHashTags.push(validHashTag);
         }
 
-        if (validHashTags.length > 0) {
+        if (validHashTags.length > 0)
             message["hashTags"] = validHashTags;
-            return message;
-        }
+
+        return message;
     }
 
     /**
@@ -163,7 +165,24 @@ const MessageHandler = class {
 
         if (self.coolDownCounter == 0) {
             self.initCoolDown();
-            self.callLightHandler('3', lampConfig.problemColor);
+            const lampID = self.getLampID(message);
+            self.callLightHandler('2', lampConfig.problemColor);
+        }
+    }
+
+    /**
+     * Searh 'channels.json' for lamp-ID by channel-ID.
+     *
+     * @param message
+     * @returns {*}
+     */
+    getLampID(message) {
+        const channelID = message.channel;
+
+        for (let channel of channelConfig) {
+            if (channelID == channel.id) {
+                return channel.lampID;
+            }
         }
     }
 
@@ -185,7 +204,7 @@ const MessageHandler = class {
             self.callLightHandler('2', lampConfig.questionColor);
         }
 
-        // TODO: Post question to screen.
+        this.eventEmitter.emit('userQuestion', message);
     }
 
     /**
