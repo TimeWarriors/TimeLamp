@@ -1,38 +1,48 @@
 'use strict';
-
-
+// TODO: refactor this class to make it more understandible and smaler!s
 const ColorSchedule = class {
     constructor() {
         this.dateHelper = require('./dateHelper.js');
         this.arrayHelper = require('./arrayHelper.js');
         const C = require('../../colorTimeConverter/colorTimeConverter.js');
         this.colorTimeConverter = new C();
+        this.roomOccupiedColor = false;
+        this.avalibleColor = false;
     }
 
-    getColorTimeSchedule(roomSchedule, roomBookingTimes, avalibleColor){
+    getColorTimeSchedule(roomSchedule, roomBookingTimes, avalibleColor, roomOccupiedColor){
+        this.roomOccupiedColor = roomOccupiedColor;
+        this.avalibleColor = avalibleColor;
         let sortedRoomBookingTimes = this.sortRoomBookingOnTime(roomBookingTimes);
         let maxTimeVal = this.getMaxTimeValue(sortedRoomBookingTimes);
+        // valid rooms
+        let validRoomSchedule = roomSchedule.filter(room =>
+            room[0].hasOwnProperty('booking'));
 
-        let colorSchedule = roomSchedule.map((room) => {
-            // incomplete room object
-            if(!room[0].hasOwnProperty('booking')){ return null; }
-            return this.arrayHelper.isArrayLargerThanOne(room) ?
-                this.compareBookingTimes(
-                    room,
-                    maxTimeVal,
-                    sortedRoomBookingTimes) :
-                [this.buildSchedule(
-                    this.dateHelper.buildDateFromString(
-                        room[0].booking.time.startTime),
+        // single booking per room
+        let singleBookings = validRoomSchedule.filter(room => !this.arrayHelper.isArrayLargerThanOne(room))
+            .map(room => {
+                return [this.buildSchedule(
+                    this.dateHelper.buildDateFromString(room[0].booking.time.startTime),
                     room[0].booking.id,
                     sortedRoomBookingTimes,
-                    this.dateHelper.buildDateFromString(
-                        room[0].booking.time.endTime)
+                    this.dateHelper.buildDateFromString(room[0].booking.time.endTime)
                 )];
-        });
+            });
+        // multible bookings per room
+        let multibleBookings = validRoomSchedule.filter(room => this.arrayHelper.isArrayLargerThanOne(room))
+            .map(room =>
+                this.compareBookingTimes(room, maxTimeVal, sortedRoomBookingTimes));
+
+        // add start color
+        let startColor = this.getStartColor(this.arrayHelper.mergeArrays(
+                multibleBookings, singleBookings), roomOccupiedColor);
+
         return this.arrayHelper.concatArray(
                 this.endTimeBuilder(
-                    this.arrayHelper.filterNull(colorSchedule), maxTimeVal, avalibleColor));
+                    startColor,
+                    maxTimeVal, avalibleColor));
+
     }
 
     /**
@@ -44,7 +54,8 @@ const ColorSchedule = class {
             colorSchedule: this.timeBuilder(time, avalibleTimes),
             roomId: id,
             startTime: time,
-            endTime: endTime
+            endTime: endTime,
+            startColor: this.avalibleColor
         };
     }
 
@@ -203,30 +214,102 @@ const ColorSchedule = class {
     }
 
     /**
+     * [it adds the default start color value]
+     * @param  {[]} colorTimeSchedule []
+     * @return {[array]}  [array with start color values added to colorSchedule]
+     */
+    getStartColor(colorTimeSchedule){
+        const timeNow = new Date();
+        let startColorObj = null;
+        let itemIndex = null;
+        let singleBookings = colorTimeSchedule.filter(room => !this.arrayHelper.isArrayLargerThanOne(room));
+        let multibleBookings = colorTimeSchedule.filter(room => this.arrayHelper.isArrayLargerThanOne(room));
+
+        const startColorAdder = (room) => {
+            room.colorSchedule.reduce((prev, current, index, array) => {
+                if(timeNow > prev.time && timeNow < current.time){
+                    let aColor = this.colorTimeConverter.getColor(
+                            prev.time, current.time, timeNow, prev.color, current.color);
+
+                    itemIndex = index;
+                    let color = prev.color;
+                    room.startColor = prev.color;
+                    if(prev.fade){
+                        color = Math.floor(aColor);
+                        room.startColor = Math.floor(aColor);
+                    }
+                    startColorObj = this.timeObject(
+                        this.dateHelper.addMinuteToDate(1, timeNow),
+                        color,
+                        current.color,
+                        prev.fade,
+                        prev.pulse,
+                        prev.emit,
+                        Math.floor(this.dateHelper.getTimeBetweenDates(current.time, timeNow)),
+                        Math.floor(this.dateHelper.getTimeBetweenDates(
+                            room.startTime, timeNow))
+                    );
+                    if(this.dateHelper.getTimeBetweenDates(this.dateHelper.addMinuteToDate(1, timeNow),current.time) === 0){
+                        startColorObj = null;
+                    }
+                }
+                return current;
+            });
+            if(startColorObj !== null){
+                room.colorSchedule.splice(itemIndex, 0, startColorObj);
+            }
+            startColorObj = null;
+            itemIndex = null;
+            if(timeNow > room.startTime && timeNow < room.endTime){
+                room.startColor = this.roomOccupiedColor;
+            }
+            return room;
+        };
+
+        singleBookings = this.arrayHelper.concatArray(singleBookings).map(room => {
+            return startColorAdder(room);
+        });
+
+        multibleBookings = multibleBookings.map(rooms => {
+            rooms.map(room => {
+                return startColorAdder(room);
+            });
+            return rooms;
+        });
+
+        return this.arrayHelper.mergeArrays(
+                multibleBookings, singleBookings);
+    }
+
+    /**
      * [creates endTime ColorSchedule for bookings]
      * @return {[array]}               [colorSchedule with end times]
      */
     endTimeBuilder(roomsColorSchdule, maxTimeVal, avalibleColor){
         let lastElement;
-        roomsColorSchdule.forEach((room) => {
-            if(!this.arrayHelper.isArrayLargerThanOne(room)){
-                lastElement = this.timeObject(
-                    room[0].endTime,
-                    avalibleColor,
-                    avalibleColor,
-                    false,
-                    false,
-                    true,
-                    null,
-                    'bookingEnd'
-                );
-                room[room.length-1].colorSchedule.push(lastElement);
-                return;
-            }
+        let singleBookings = roomsColorSchdule.filter(room => !this.arrayHelper.isArrayLargerThanOne(room));
+        let multibleBookings = roomsColorSchdule.filter(room => this.arrayHelper.isArrayLargerThanOne(room));
+
+        let singleLastElements = this.arrayHelper.concatArray(singleBookings).map((room) => {
+            room.colorSchedule.push(this.timeObject(
+                room.endTime,
+                avalibleColor,
+                avalibleColor,
+                false,
+                false,
+                true,
+                null,
+                'bookingEnd'
+            ));
+            return room;
+        });
+
+        multibleBookings.forEach((room) => {
             room.reduce((prev, current, index, array) => {
                 let prevEndTime = prev.endTime;
                 let currentStartTime = current.startTime;
                 let currentEndTime = current.endTime;
+
                 lastElement = this.timeObject(
                     currentEndTime,
                     avalibleColor,
@@ -237,6 +320,7 @@ const ColorSchedule = class {
                     null,
                     'bookingEnd'
                 );
+
                 if(this.isFullIntervall(currentStartTime, prevEndTime, maxTimeVal)){
                     prev.colorSchedule.push(
                         this.timeObject(
@@ -255,7 +339,9 @@ const ColorSchedule = class {
             });
             room[room.length-1].colorSchedule.push(lastElement);
         });
-        return roomsColorSchdule;
+
+        return this.arrayHelper.mergeArrays(
+            this.arrayHelper.concatArray(multibleBookings), singleLastElements);
     }
 };
 
