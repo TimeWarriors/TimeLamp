@@ -18,6 +18,8 @@ const Nightmode = class {
      */
     init(){
         co(function* (){
+            this.removeNodeScheduleEvents(this.nodeSchedules);
+
             let settings = yield this.getSettings('hue');
             let lampSettings = this.getLampSettings(settings);
             let lampRoomIds = this.getRoomIdsFromLamps(lampSettings);
@@ -39,6 +41,23 @@ const Nightmode = class {
             }).catch((er) => {
                 console.log(er);
             });
+    }
+
+    /**
+     * [removes old node schedule events]
+     * @param  {[array]} nodeScheduleEvents [array of nodeschedules]
+     */
+    removeNodeScheduleEvents(nodeScheduleEvents){
+        nodeScheduleEvents.forEach((jobCollections) => {
+            try {
+                jobCollections.forEach((job) => {
+                    try {
+                        job.cancel();
+                    } catch (e) {}
+                });
+            } catch (e) {}
+        });
+        this.nodeSchedules = [];
     }
 
     /**
