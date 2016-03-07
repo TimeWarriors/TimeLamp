@@ -8,8 +8,8 @@ const https = require('https');
 
 const WebSocketHandler = class {
 
-    constructor() {
-        this.messageHandler = new MessageHandler();
+    constructor(eventEmitter) {
+        this.messageHandler = new MessageHandler(eventEmitter);
     }
 
     /**

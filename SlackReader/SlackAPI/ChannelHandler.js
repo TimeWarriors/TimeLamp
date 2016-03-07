@@ -8,6 +8,7 @@ const Jsonfile = require('jsonfile');
 const TimeEditApi = require('timeeditapi');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
+const TimeLamp = require('../../settings/settings.js');
 
 
 const ChannelHandler = class {
@@ -105,9 +106,21 @@ const ChannelHandler = class {
         return channels;
     }
 
+    getLampIDForChannels(channels) {
+        for (let channel of channels) {
+            if (channel.hasOwnProperty('lectureRoom')) {
+                const room = channel.lectureRoom.toLowerCase().substring(0, 4);
+                let lampIDs = await (this.TimeLamp.getLampsinRoom(room));
+                lampIDs = lampID[0].lampId; // TODO: Change this.
+                channel['lampID'] = lampIDs;
+            }
+        }
+        return channels;
+    }
+
     /**
-     *  Search the schedule-object
-     *  and look for "time"-property.
+     * Search the schedule-object
+     * and look for "time"-property.
      *
      * @param schedule
      * @returns {boolean}
