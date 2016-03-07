@@ -1,4 +1,11 @@
 {
+    "nightMode": {
+        "startColor": 46920,
+        "endColor": 25500,
+        "startTime": "20:00",
+        "endTime": "04:00"
+    },
+    "roomOccupiedColor": 0,
     "roomAvalibleColor": 25500,
     "preRoomBookingTimes" : [
         {

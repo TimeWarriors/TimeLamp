@@ -17,7 +17,6 @@ const MyModule = class {
      * [module start function]
      */
     init(){
-
         co(function* (){
             this.removeNodeScheduleEvents(this.nodeSchedules);
 
@@ -27,14 +26,21 @@ const MyModule = class {
             let lampRoomIds = this.getRoomIdsFromLamps(lampSettings);
             let lampHueIds = this.getHueLampId(lampSettings);
             let roomSchedule = yield this.getTodaysRoomSchedule(lampRoomIds);
+            let colorTimeSchedule = colorSchedule.getColorTimeSchedule(
+                roomSchedule,
+                moduleSettings.preRoomBookingTimes,
+                moduleSettings.roomAvalibleColor,
+                moduleSettings.roomOccupiedColor);
+            yield this.setDefaultColor(
+                lampSettings,
+                moduleSettings.roomAvalibleColor,
+                colorTimeSchedule,
+                moduleSettings.preRoomBookingTimes);
 
-            this.setDefaultColor(lampHueIds, moduleSettings.roomAvalibleColor);
-            return colorSchedule.getColorTimeSchedule(roomSchedule, moduleSettings.preRoomBookingTimes, moduleSettings.roomAvalibleColor);
+            return colorTimeSchedule;
         }.bind(this))
             .then((colorTimeSchedule) => {
-                console.log(JSON.stringify(colorTimeSchedule, null, 2));
                 this.nodeSchedules = this.makeNodeSchedule(colorTimeSchedule);
-                console.log('done');
             })
             .catch((e) => {
                 console.error(e.stack);
@@ -46,12 +52,10 @@ const MyModule = class {
      * @param  {[type]} object []
      */
     changeColor(properties){
-        console.log('======!');
-        console.log(properties);
+        if(properties.emit){ this.emittTimes(properties); }
         this._.settings.getLampsinRoom(properties.roomId)
             .then((lampsInRoom) => {
                 lampsInRoom.forEach((lamps) => {
-                    if(properties.emit){ this.emittTimes(properties); }
                     if(properties.pulse){
                         return this._.lightHandler.changeColorWithHue(lamps.lampId,
                             properties.color, 0).then(() => {
@@ -64,9 +68,12 @@ const MyModule = class {
                     }
                     return properties.fade ?
                         this._.lightHandler.changeColorWithHue(lamps.lampId,
-                            properties.nextColor,
-                            this.convertMinutesToSeconds(properties.timeDif)
-                        ) :
+                            properties.color, 0).then(() => {
+                                this._.lightHandler.changeColorWithHue(lamps.lampId,
+                                    properties.nextColor,
+                                    this.convertMinutesToSeconds(properties.timeDif)
+                                );
+                            }) :
                         this._.lightHandler.changeColorWithHue(lamps.lampId,
                             properties.color, 0);
 
@@ -92,7 +99,6 @@ const MyModule = class {
     makeNodeSchedule(roomColorTimeSchedule){
         return roomColorTimeSchedule.map((booking) => {
             return booking.colorSchedule.map((status) => {
-                console.log(status.time);
                 return this._.nodeSchedule.scheduleFunctionCallJob(
                     new Date(status.time),
                     this.changeColor.bind(this),{
@@ -176,10 +182,26 @@ const MyModule = class {
      * @param {[array]} lamps          [array of lamp objects]
      * @param {[object]} moduleSettings [settings object for this module]
      */
-    setDefaultColor(lampIds, defaultColor){
-        lampIds.forEach(lampId =>
-            this._.lightHandler.changeColorWithHue(lampId, defaultColor, 0)
-        );
+    setDefaultColor(lampSettings, defaultColor, colorTimeSchedule, roomBookingTimes){
+        let timeNow = new Date();
+        const changeColor = (booking) => {
+            lampSettings.forEach(lamp => {
+                if(booking.roomId === lamp.roomId){
+                    this._.lightHandler.changeColorWithHue(lamp.lampId, booking.startColor, 0);
+                }
+            });
+        };
+        return new Promise((resolve, reject) => {
+            Promise.all(lampSettings.map(lamp =>
+                this._.lightHandler.changeColorWithHue(lamp.lampId, defaultColor, 0)))
+                .then(result => {
+                    colorTimeSchedule.filter(booking => timeNow > booking.colorSchedule[0].time && timeNow < booking.endTime)
+                        .forEach(booking => changeColor(booking));
+                    resolve(true);
+                }).catch(er => {
+                    reject(er);
+                });
+        });
     }
 };
 
