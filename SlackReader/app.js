@@ -1,14 +1,27 @@
 'use strict';
 
 const SlackAPI = require('./SlackAPI/SlackAPI.js');
-let slackAPI = new SlackAPI();
+const slackAPI = new SlackAPI();
+const TimeLamp = require('../settings/settings.js');
+const timeLamp = new TimeLamp();
 
 
+// TODO: lamp cooldown för varje specifik lampa.
 
+/**********************************/
 /* Update ConfigFile for Channels */
+/**********************************/
 //slackAPI.updateChannelsFile();
 
-/* Get latest messages for specific Slack channel */
-//slackAPI.getMessages('1dv450', '1455106500');
+/*******************************/
+/* Update ConfigFile for Users */
+/*******************************/
+//slackAPI.updateUsersFile();
 
-slackAPI.initWebSocket();
+/******************************/
+/* Connect to Slack WebSocket */
+/******************************/
+//slackAPI.initWebSocket();
+
+
+console.log(timeLamp.getLampsinRoom('Ny106K'));

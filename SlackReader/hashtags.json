@@ -1,13 +1,16 @@
 [
     {
+      "type": "problem",
       "hashTag": "#!",
       "priority": 3
     },
     {
+      "type": "question",
       "hashTag": "#?",
       "priority": 2
     },
     {
+      "type": "info",
       "hashTag": "#I",
       "priority": 1
     }
