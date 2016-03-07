@@ -47,6 +47,12 @@ const DateHelper = class ClassName {
         return myDate;
     }
 
+    addDayToDate(days, d){
+        d = d || new Date();
+        d.setDate(d.getDate()+days);
+        return d;
+    }
+
     subtractTime(date, time){
         let myDate = new Date(date);
         myDate.setMinutes(myDate.getMinutes()-time);
