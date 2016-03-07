@@ -1,0 +1,70 @@
+html
+{
+    width: 100%;
+    height: 100%;
+}
+
+body
+{
+    width:80%;
+    height: 100%;
+    font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif;
+    color:#222;
+    background-color: #C8C8C8;
+}
+
+#header
+{
+    height: 80%;
+    widows: 80%;
+    background-color:black;
+    border:2px solid black;
+    color:white;
+    text-align:center;
+}
+
+#main
+{
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 80%;
+    height: 300px;
+    background-color: #C8C8C8;
+    text-align: center;
+    border:2px solid black;
+}
+
+#footer
+{
+
+}
+
+#buttonForPC
+{
+    width:80%;
+    height:10%;
+}
+
+#buttonForTV
+{
+    width:80%;
+    height:10%;
+}
+#list
+{
+    list-style-type: none;
+}
+
+img
+{
+    margin-right:86px;
+    float:right;
+    width:15px;
+    height:15px;
+}
+
+a
+{
+    text-decoration: none;
+    color:black;
+}
