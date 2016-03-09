@@ -1,0 +1,52 @@
+html{
+    font-family: 'Roboto', sans-serif;
+}
+
+/**
+ * #4D394B
+ *
+ * #FFFFFF
+ *
+ * #E3E4E6
+ *
+ *
+ */
+
+/*
+#listView ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+#listView li{
+    text-align: center;
+    height: calc(100vh / 4);
+    max-height: calc(100vh / 4);
+    border-bottom: 1px solid lightgray;
+
+}
+
+#listView li:nth-child(1){
+    font-size: 3vw;
+}
+
+#listView li:nth-child(2){
+    font-size: 3vw;
+}
+
+#listView li:nth-child(3){
+    font-size: 3vw;
+}
+
+#listView li:nth-child(4){
+    font-size: 3vw;
+}
+*/
+
+.highlight{
+    background-color: #E3E4E6;
+}
+
+[v-cloak] {
+    display: none;
+}
