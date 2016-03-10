@@ -5,13 +5,14 @@ client.listView = function(oldMessageView){
     return new Vue({
         el: '#listView',
         data: {
-            items:[]
+            items:[],
+            warningsItem: null
         },
         methods: {
             updateMessages: function(message){
                 message.itemLabel = this.setItemLabelClass(message.hashTags);
                 message.buttonOutline = this.setButtonOutlineClass(message.hashTags);
-                
+
                 if(this.items.length >= 4){
                     this.items.push(message);
                     oldMessageView.addMessage(this.items[0]);

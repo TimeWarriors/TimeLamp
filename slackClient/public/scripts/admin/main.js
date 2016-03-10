@@ -10,11 +10,12 @@ client.init = function(){
     client.connect();
 
     var oldMessageView = client.oldMessageView();
+    client.modalView = client.modalView(oldMessageView);
     var listView = client.listView(oldMessageView);
+
     client.onMessage(listView.updateMessages);
     client.onRemove(listView.removeMessage);
     client.onHighlight(listView.highlightMessage);
-
 };
 
 client.connect = function(){
@@ -29,7 +30,7 @@ client.emit = function(chanel, data){
 
 client.onMessage = function(fn) {
     socket.on('message', function(data) {
-        console.log('Incoming message:', data);
+        //console.log('Incoming message:', data);
         fn(data);
     });
 };
