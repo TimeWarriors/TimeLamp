@@ -11,12 +11,26 @@
 </head>
 <body>
 
+
+    <header class="header">
+        <div class="container">
+            <div class="header-left"></div>
+            <!-- Right side -->
+            <div class="header-right header-menu">
+                <a class="header-item" href="#">
+                    <img src="/images/lnu_logo.png" alt="Logo">
+                </a>
+
+            </div>
+        </div>
+    </header>
+
     <!-- old items view -->
     <section id="oldItems">
         <div class="openMenu" v-if="showOpenMenu">
             <span class="material-icons mdl-badge">
-                   <i v-on:click="toggleList" class="material-icons closeListFont">history</i>
-               </span>
+                <i v-on:click="toggleList" class="material-icons closeListFont">history</i>
+            </span>
         </div>
         <div class="listWrap" v-if="show" transition="expand" v-cloak>
             <div id="closeList">
@@ -24,14 +38,13 @@
             </div>
             <div class="list">
                 <ul>
-                    <li v-for="item in items">
-                        <div class="oldMessMenuInfoWrap" v-on:click="toggleMessage(item)">{{item}}</div>
+                    <li v-for="item in items" v-on:click="toggleMessage(item)">
+                        <div class="oldMessMenuInfoWrap">{{item}}</div>
                     </li>
                 </ul>
             </div>
         </div>
     </section>
-
 
     <!-- new messages view -->
     <section class="columns is-mobile ">
@@ -55,25 +68,28 @@
 
     <!-- specific message view -->
     <section id="modalView">
-        <div class="modal" v-bind:class="[item.modal]" >
-            <div class="modal-background"></div>
-            <div class="modal-container">
+        <div class="modal" v-el:modal>
+            <div class="modal-background" v-on:click="closeModal()"></div>
+            <div class="modal-container modalBox">
                 <div class="box">
-                <div class="modal-content">
-                    <div class="oldMessMenuInfoWrap"></div>
-                </div>
+                    <div class="modal-content">
+                        <div class="columns modalHeight">
+                            <div class="column is-10" v-el:modal-text></div>
+                            <button class="column button is-warning" v-on:click="revertMessage()">revert</button>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button class="modal-close" v-on:click="toggleMessage(item)"></button>
+            <button class="modal-close" v-on:click="closeModal()"></button>
         </div>
     </section>
 
     <div id="courseId" data-course-Id="{{courseId}}"></div>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.17/vue.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
-    <script src="/scripts/listView.js"></script>
+    <script src="/scripts/admin/listView.js"></script>
     <script src="/scripts/modalView.js"></script>
-    <script src="/scripts/oldMessages.js"></script>
-    <script src="/scripts/main.js"></script>
+    <script src="/scripts/admin/oldMessages.js"></script>
+    <script src="/scripts/admin/main.js"></script>
 </body>
 </html>
