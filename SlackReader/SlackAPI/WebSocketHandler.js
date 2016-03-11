@@ -1,63 +1,90 @@
 'use strict';
 
 const WebSocketClient = require('websocket').client;
+const MessageHandler = require('./MessageHandler.js');
 const slackConfig = require('../slackConfig.json');
 const https = require('https');
 
 
 const WebSocketHandler = class {
-    constructor() {
-        // Empty for now.
+
+    constructor(eventEmitter) {
+        this.messageHandler = new MessageHandler(eventEmitter);
     }
 
+    /**
+     * GET URL to Slacks WebSocket-server.
+     *
+     * @returns {Promise}
+     */
     getWebSocketURL() {
         return new Promise((resolve, reject) => {
-            let options = {
+            const path =
+                `/api/rtm.start
+                ?token=${slackConfig.token}`
+                .replace(/\s+/g, ''); // Escape spaces.
+
+            const options = {
                 hostname: slackConfig.hostName,
-                path: `/api/rtm.start?token=${slackConfig.token}`,
+                path: path,
                 method: 'GET'
             };
 
-            let req = https.request(options, res => {
+            const req = https.request(options, res => {
                 let chunks = [];
 
-                res.on('data', chunk => {
-                    chunks.push(chunk);
-                }).on('end', () => {
+                res.on('data', chunk =>
+                    chunks.push(chunk));
+
+                res.on('end', () => {
                     let body = Buffer.concat(chunks);
                     body = JSON.parse(body);
-                    return resolve(body.url);
+                    resolve(body.url);
                 });
-            }).on('error', error => {
-                return reject(error);
-            }).end();
+            });
+            req.end();
+
+            req.on('error', error =>
+                reject(error));
         });
     }
 
+    /**
+     * Connect to Slacks WebSocket-server.
+     *
+     * @param url
+     */
     connectToWebSocket(url) {
-        let self = this;
-        let client = new WebSocketClient();
+        const client = new WebSocketClient();
         client.connect(url);
 
-        client.on('connect', function(connection) {
-            console.log('WebSocket Client Connected');
+        client.on('connect', connection =>
+            this.handleConnection(connection));
 
-            connection.on('message', function(message) {
-                let msg = JSON.parse(message.utf8Data);
-
-                if (msg.type === 'message') {
-                    console.log(msg.text);
-                    if (msg.text.includes('#')) {
-                        self.handleMessage(msg.text);
-                    }
-                }
-            });
-        });
+        client.on('connectFailed', error =>
+            this.handleError(error));
     }
 
-    handleMessage(message) {
-        let self = this;
-        // TODO: Handle message.
+    /**
+     * Handle WebSocket connection when connected.
+     *
+     * @param connection
+     */
+    handleConnection(connection) {
+        connection.on('message', message =>
+            this.messageHandler.handleMessage(message));
+
+        connection.on('error', error =>
+            this.handleError(error));
+    }
+
+    /**
+     * Console log error.
+     *
+     * @param error
+     */
+    handleError(error) {
+        console.log(`An error occurred: ${error}`);
     }
 
 };
