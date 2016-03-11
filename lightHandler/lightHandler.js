@@ -5,6 +5,10 @@ let http = require('http');
 function LightHandler() {
 
 }
+/**
+ *get all lamps installed on the bridge
+ * @returns {promise} [resolve = json object with all the information about the installed lamps]
+ */
 LightHandler.prototype.getHueLamps = function () {
     return new Promise((resolve, reject) => {
         let options = {
@@ -25,6 +29,11 @@ LightHandler.prototype.getHueLamps = function () {
         });
     })
 }
+/**
+ * gets lamp by specified id
+ * @param   {string} id [id of lamp to get]
+ * @returns {promise} [resolve = json object with all the information about the lamp]
+ */
 LightHandler.prototype.getHueLampById = function (id) {
     return new Promise((resolve, reject) => {
         let options = {
@@ -45,7 +54,13 @@ LightHandler.prototype.getHueLampById = function (id) {
         });
     })
 }
-
+/**
+ * Change the brightness of a specified lamp
+ * @param   {string} lampId          [Id of the lamp]
+ * @param   {int} brightness      [brightness (0-255)]
+ * @param   {int} secondsToChange [transitiontime]
+ * @returns {Promise} [with responsedata from the api]
+ */
 LightHandler.prototype.changeBrightness = function (lampId, brightness, secondsToChange) {
     return new Promise((resolve, reject) => {
         let bodyMessage = JSON.stringify({
@@ -78,7 +93,13 @@ LightHandler.prototype.changeBrightness = function (lampId, brightness, secondsT
         req.end();
     })
 }
-
+/**
+ * Change the saturation of a specified lamp
+ * @param   {string} lampId          [Id of the lamp]
+ * @param   {int} saturation      [saturation(0-255)]
+ * @param   {int} secondsToChange [transitiontime]
+ * @returns {promise} [with responsedata from the api]
+ */
 LightHandler.prototype.changeSaturation = function (lampId, saturation, secondsToChange) {
     return new Promise((resolve, reject) => {
         let bodyMessage = JSON.stringify({
@@ -112,6 +133,12 @@ LightHandler.prototype.changeSaturation = function (lampId, saturation, secondsT
     })
 }
 
+/**
+ * Turn a lamp on or off
+ * @param   {string} lampId [id of lamp]
+ * @param   {bool} status [true/false for on/off]
+ * @returns {promise} [returns the responsedata from the api]
+ */
 LightHandler.prototype.On = function (lampId, status) {
         return new Promise((resolve, reject) => {
             let bodyMessage = JSON.stringify({
@@ -144,7 +171,13 @@ LightHandler.prototype.On = function (lampId, status) {
 
         })
     }
-    //lampid, bool on, blinkrate ms(optional defaults to 1000)
+/**
+ * Toggle warningblink for specified lamp
+ * @param   {string} lampId           [id of lamp]
+ * @param   {bool} on               [true/false for on/off]
+ * @param   {float} [blinkrate=1000] [rate(ms) the lamp should pulse/blink at]
+ * @returns {interval} [returns interval that you can unset]
+ */
 LightHandler.prototype.toggleWarning = function (lampId, on, blinkrate) {
     let self = this;
     blinkrate = blinkrate || 1000;
@@ -163,6 +196,14 @@ LightHandler.prototype.toggleWarning = function (lampId, on, blinkrate) {
     }
 }
 
+/**
+ * Warningblink for x seconds in y color blinking at z rate.
+ * @param   {string} lampId    [id of lamp]
+ * @param   {float} blinkrate [rate(ms) the lamp should pulse/blink at]
+ * @param   {float} seconds   [amount of seconds to blink/pulse]
+ * @param   {int} hue       [the color it should blink/pulse(0-65535)]
+ * @returns {promise} 
+ */
 LightHandler.prototype.setWarning = function (lampId, blinkrate, seconds, hue) {
     return new Promise((resolve, reject) => {
         let self = this;
@@ -184,6 +225,13 @@ LightHandler.prototype.setWarning = function (lampId, blinkrate, seconds, hue) {
     })
 }
 
+/**
+ * changes the color of the specified lamp using hue.
+ * @param   {string} lampId          [id of lamp]
+ * @param   {int} hue             [Color to change the lamp to (0-65535)]
+ * @param   {float} secondsToChange [[Description]]
+ * @returns {promise} [returns the responsedata from the api]
+ */
 LightHandler.prototype.changeColorWithHue = function (lampId, hue, secondsToChange) {
     return new Promise((resolve, reject) => {
         let bodyMessage = JSON.stringify({
