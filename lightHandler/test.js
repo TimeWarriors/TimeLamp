@@ -26,6 +26,28 @@ describe('lightHandler.getHueLamps()', function () {
     })
 });
 
+describe('lightHandler.getHueLampById()', function () {
+    var tests = [
+        {
+            args: [testLamp], 
+            expected: {}
+        },
+  ];
+
+    tests.forEach(function (test) {
+        it("gets the lamp", function () {
+            return lightHandler.getHueLampById.apply(null, test.args).then(function (res) {
+                try {
+                    let obj = JSON.parse(res);
+                    assert(typeof (obj) === typeof (test.expected), "Expected: " + typeof (test.expected) + " got: " + typeof (obj));
+                } catch (e) {
+                    assert(false, "not valid json object. Got error: " + e.message)
+                }
+            })
+        });
+    })
+});
+
 describe('lightHandler.changeColorWithHue()', function () {
     var testLampId = testLamp;
     var tests = [
