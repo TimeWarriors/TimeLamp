@@ -3,7 +3,7 @@
 
 This file contains proporties for lamps.
 
-** Example **
+**Example**
 ```JSON
 [
     {
@@ -22,7 +22,7 @@ This file contains proporties for nightmode and lamp color options.
 
 * If the emit proporty in preRooBookingTimes objects is true it will emit on the time value plus a string named "time"  ex  *"time_120"*
 
-** Example **
+**Example**
 ```JSON
 {
     "nightMode": { // nightmode props.

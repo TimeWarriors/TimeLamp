@@ -11,7 +11,7 @@ exports.run = function(functionLayer){
     return new Nightmode(functionLayer);
 };
 ```
-Example of functionLayer classes
+**Example of functionLayer classes**
 ```javascript
 functionLayer = {
     nodeSchedule, // make and cancel node schedules
@@ -22,3 +22,18 @@ functionLayer = {
 };
 ```
 * An **"init()"** function, the init function is the function that will be run x times a day so the starting point of your module should be the init() function.
+
+
+In the folder moduleLoader open moduleLoader.js and require your in the requireModules() function
+
+**Example of moduleLoader.js and requireModules()**
+```javascript
+requireModules(){
+    this.timeLampModules.push(
+        require('../timeLamp_modules/saturationStartChange.js').run(this._),
+        require('../timeLamp_modules/changeColorWithTime.js').run(this._),
+        require('../timeLamp_modules/nightmode.js').run(this._)
+        // <= Require your timeLamp_module here.
+    );
+}
+```
