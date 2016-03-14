@@ -8,6 +8,7 @@ const channelConfig = require('../channels.json');
 const LightHandler = require('../../lightHandler/lightHandler.js');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
+const Jsonfile = require('jsonfile');
 const usersFile = require('../users.json');
 
 
@@ -16,7 +17,38 @@ const MessageHandler = class {
     constructor(eventEmitter) {
         this.eventEmitter = eventEmitter;
         this.lightHandler = new LightHandler();
-        this.coolDownCounter = 0;
+        this.setupCoolDownCounters();
+    }
+
+    /**
+     * Setup cooldown-counters for all channels.
+     */
+    setupCoolDownCounters() {
+        this.coolDownCounters = {};
+        this.elements = [];
+        const channels = Jsonfile.readFileSync('./channels.json');
+
+        for (let channel of channels) {
+            this.elements.push(channel.id);
+        }
+
+        for (let i = this.elements.length; i--; ) {
+            this.coolDownCounters[this.elements[i]] = 0;
+        }
+    }
+
+    /**
+     * Initiate cooldown-effect for Philips Hue.
+     *
+     * @param channelID
+     */
+    initCoolDown(channelID) {
+        this.coolDownCounters[channelID] = 15;
+        setInterval(() => {
+            if (this.coolDownCounters[channelID] > 0)
+                this.coolDownCounters[channelID] -= 1;
+            else clearInterval();
+        }, 1000);
     }
 
     /**
@@ -101,7 +133,8 @@ const MessageHandler = class {
 
         for (let hashTag of hashTags) {
             const validHashTag = hashTag.hashTag;
-            if (this.isValidHashTagIncluded(message.text, validHashTag))
+            const text = message.text;
+            if (this.isValidHashTagIncluded(text, validHashTag))
                 validHashTags.push(validHashTag);
         }
 
@@ -158,20 +191,62 @@ const MessageHandler = class {
      * @param self
      */
     handleStreamProblem(message, self) {
-        const userName = self.getUserNameByID(message.user);
+        const channelID = message.channel;
+        const botMessage = slackConfig.problemMessage;
+        const userName = self.getUserName(message.user);
+        self.postBotMessageToChannel(channelID, botMessage, userName);
 
-        self.postBotMessageToChannel(
-            message.channel, slackConfig.problemMessage, userName);
-
-        if (self.coolDownCounter == 0) {
-            self.initCoolDown();
+        if (self.coolDownCounters[channelID] == 0) {
+            self.initCoolDown(channelID);
             const lampID = self.getLampID(message);
-            self.callLightHandler('2', lampConfig.problemColor);
+            const lampColor = lampConfig.problemColor;
+            self.callLightHandler(lampID, lampColor);
         }
     }
 
     /**
-     * Searh 'channels.json' for lamp-ID by channel-ID.
+     * Post Bot-response to channel.
+     * Call 'LightHandler' if no cooldown.
+     *
+     * @param message
+     * @param self
+     */
+    handleUserQuestion(message, self) {
+        const channelID = message.channel;
+        const botMessage = slackConfig.questionMessage;
+        const userName = self.getUserName(message.user);
+        self.postBotMessageToChannel(channelID, botMessage, userName);
+
+        if (self.coolDownCounters[channelID] == 0) {
+            self.initCoolDown(channelID);
+            const lampID = self.getLampID(message);
+            const lampColor = lampConfig.questionColor;
+            self.callLightHandler(lampID, lampColor);
+        }
+
+        // Add channel-name to message.
+        const channelName = self.getChannelName(channelID);
+        message["channelName"] = channelName;
+
+        //this.eventEmitter.emit('userQuestion', message);
+    }
+
+    /**
+     * Post Bot-response to channel.
+     * Call 'LightHandler' if no cooldown.
+     *
+     * @param message
+     * @param self
+     */
+    handleInfoRequest(message, self) {
+        const channelID = message.channel;
+        const botMessage = slackConfig.infoMessage;
+        const userName = self.getUserName(message.user);
+        self.postBotMessageToChannel(channelID, botMessage, userName);
+    }
+
+    /**
+     * Search 'channels.json' for lamp-ID by channel-ID.
      *
      * @param message
      * @returns {*}
@@ -187,38 +262,17 @@ const MessageHandler = class {
     }
 
     /**
-     * Post Bot-response to channel.
-     * Call 'LightHandler' if no cooldown.
-     *
-     * @param message
-     * @param self
+     * Get channel-name by channel-ID.
+     * 
+     * @param channelID
+     * @returns {*}
      */
-    handleUserQuestion(message, self) {
-        const userName = self.getUserNameByID(message.user);
-
-        self.postBotMessageToChannel(
-            message.channel, slackConfig.questionMessage, userName);
-
-        if (self.coolDownCounter == 0) {
-            self.initCoolDown();
-            self.callLightHandler('2', lampConfig.questionColor);
+    getChannelName(channelID) {
+        for (let channel of channelConfig) {
+            if (channel.id == channelID) {
+                return channel.name;
+            }
         }
-
-        this.eventEmitter.emit('userQuestion', message);
-    }
-
-    /**
-     * Post Bot-response to channel.
-     * Call 'LightHandler' if no cooldown.
-     *
-     * @param message
-     * @param self
-     */
-    handleInfoRequest(message, self) {
-        const userName = self.getUserNameByID(message.user);
-
-        self.postBotMessageToChannel(
-            message.channel, slackConfig.infoMessage, userName);
     }
 
     /**
@@ -227,27 +281,12 @@ const MessageHandler = class {
      * @param userID
      * @returns {string}
      */
-    getUserNameByID(userID) {
-        let userName = '';
+    getUserName(userID) {
         for (let user of usersFile) {
             if (user.id === userID) {
-                userName = user.name;
+                return user.name;
             }
         }
-        return userName;
-    }
-
-    /**
-     * Initiate cooldown-effect for Philips Hue.
-     */
-    initCoolDown() {
-        this.coolDownCounter = 15;
-        const coolDown = setInterval(() => {
-            if (this.coolDownCounter > 0)
-                this.coolDownCounter -= 1;
-            else clearInterval(coolDown);
-        }, 1000);
-        coolDown;
     }
 
     /**
@@ -273,12 +312,12 @@ const MessageHandler = class {
      * @param botMessage
      * @param user
      */
-    postBotMessageToChannel(channel, botMessage, user) {
+    postBotMessageToChannel(channelID, botMessage, userName) {
         const path =
             `/api/chat.postMessage
             ?token=${slackConfig.token}
-            &channel=${channel}
-            &text=${user}:${encodeURIComponent(botMessage)}
+            &channel=${channelID}
+            &text=${userName}:${encodeURIComponent(botMessage)}
             &username=${slackConfig.botName}
             &icon_url=${encodeURIComponent(slackConfig.botImageURL)}`
             .replace(/\s+/g, ''); // Escape spaces.

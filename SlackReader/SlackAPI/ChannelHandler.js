@@ -45,6 +45,7 @@ const ChannelHandler = class {
 
                 res.on('end', () => {
                     let body = Buffer.concat(chunks);
+                    console.log(JSON.parse(body));
                     resolve(JSON.parse(body));
                 });
             });
@@ -106,12 +107,18 @@ const ChannelHandler = class {
         return channels;
     }
 
+    /**
+     * Save room lamp-ID for all channels.
+     *
+     * @param channels
+     * @returns {*}
+     */
     getLampIDForChannels(channels) {
         for (let channel of channels) {
             if (channel.hasOwnProperty('lectureRoom')) {
                 const room = channel.lectureRoom.toLowerCase().substring(0, 4);
                 let lampIDs = await (this.TimeLamp.getLampsinRoom(room));
-                lampIDs = lampID[0].lampId; // TODO: Change this.
+                lampIDs = lampID[0].lampId; // TODO: Make array. It can have several.
                 channel['lampID'] = lampIDs;
             }
         }
