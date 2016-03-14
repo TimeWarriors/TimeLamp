@@ -60,8 +60,7 @@ const SlackAPI = class {
                 const allChannels = await (this.channelHandler.getAllChannels());
                 let channels = this.channelHandler.getChannels(allChannels);
                 channels = await (this.channelHandler.getScheduleForChannels(channels));
-                // TODO: lös detta
-                //channels = await (this.channelHandler.getLampIDForChannels(channels));
+                channels = await (this.channelHandler.getLampIDForChannels(channels));
                 this.channelHandler.saveChannels(channels);
             } catch (error) {
                 console.log(error);
