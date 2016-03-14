@@ -4,8 +4,6 @@ const SlackAPI = require('./SlackAPI/SlackAPI.js');
 const slackAPI = new SlackAPI();
 
 
-// TODO: lamp cooldown för varje specifik lampa.
-
 /**********************************/
 /* Update ConfigFile for Channels */
 /**********************************/
@@ -19,4 +17,4 @@ const slackAPI = new SlackAPI();
 /******************************/
 /* Connect to Slack WebSocket */
 /******************************/
-//slackAPI.initWebSocket();
+slackAPI.initWebSocket();

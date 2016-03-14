@@ -19,7 +19,7 @@ const UserHandler = class {
             const path =
                 `/api/users.list
                 ?token=${slackConfig.token}`
-                .replace(/\s+/g, '');
+                .replace(/\s+/g, ''); // Escape spaces.
 
             const options = {
                 hostname: slackConfig.hostName,
