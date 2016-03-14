@@ -1,13 +1,14 @@
 'use strict';
-const eventEmitter = require('events').EventEmitter;
+const Emitter = require('events').EventEmitter;
 
+const e = new Emitter();
 const EventEmitter = class {
     constructor(){
-        this.eventEmitter = new eventEmitter();
+
     }
 
     getEventEmitter(){
-        return this.eventEmitter;
+        return e;
     }
 };
 
