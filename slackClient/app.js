@@ -1,9 +1,9 @@
 'use strict';
 
-const clear = require('cli-clear');
-clear();
-clear();
-
+const port = 3334;
+const message = 'message';
+const remove = 'remove';
+const highlight = 'highlight';
 const path = require('path');
 const express = require('express');
 const app = express();
@@ -11,17 +11,51 @@ const bodyParser = require('body-parser');
 const exphbs = require('express-handlebars');
 const eventEmitter = require('../eventEmitter/eventEmitter.js');
 const emitter = eventEmitter.getEventEmitter();
+const router = express.Router();
+
+/**
+ * [generate random string]
+ * @param  {[int]} length [length of string]
+ * @return {[string]}        [random string]
+ */
+const generateRandomString = (length) => {
+    let result = '';
+    let possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+        result += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return result;
+};
+
+/**
+ * [creates object to send to clients]
+ * @param  {[onject]} data [start object to build upon]
+ * @return {[object]}      [object]
+ */
+const buildClientObject = (data) => {
+    data.uniqId = generateRandomString(32);
+    data.highlight = false;
+    return data;
+};
+
+/**
+ * [checks if string contains i]
+ * @param  {[string]} i      [word ]
+ * @param  {[string]} string [string to check in]
+ * @return {[bool]}          [if string contains i or not]
+ */
+const isChanelOpen = (i, string) => {
+    let reg = new RegExp(i, 'i');
+    return string.match(reg);
+};
 
 app.engine('.hbs', exphbs({
     extname: '.hbs',
-    defaultLayout: __dirname + '/public/layouts/index.hbs',
     partialsDir: __dirname + '/public/partials',
     layoutsDir: __dirname + '/public/layouts'
 }));
 app.set('view engine', '.hbs');
 app.set('views', path.join(__dirname,'/public/layouts'));
-
-const router = express.Router();
 
 app.use(express.static(__dirname + '/public'));
 app.use('/', router);
@@ -33,84 +67,16 @@ app.use(function(req, res, next){
     next();
 });
 
-
-/*
-{ type: 'message',
- channel: 'G0JTV0Z2A',
- user: 'U0JTRPWCD',
- text: '#? test',
- ts: '1457438526.000002',
- team: 'T0347K4GQ',
- hashTags: [ '#?' ],
- channelName: 1dv411-projekt }
- */
-
-/**===TEST===**/
-
-let iterator = 0;
-let testO = {
-    type: 'message',
-    channel: 'G0JTV0Z2A',
-    user: 'U0JTRPWCD',
-    text: '#? mess :'+iterator,
-    ts: '1457438526.000002',
-    team: 'T0347K4GQ',
-    hashTags: [ '#?' ],
-    channelName: '1dv411-projekt'
-};
-
-let test1 = {
-    type: 'message',
-    channel: 'G0JTV0Z2A',
-    user: 'U0JTRPWCD',
-    text: '#? bajs medelande',
-    ts: '1457438526.000002',
-    team: 'T0347K4GQ',
-    hashTags: [ '#?' ],
-    channelName: '1dv420-bajs'
-};
-
-setInterval(() => {
-    testO.text += iterator;
-    emitter.emit('userQuestion', testO);
-    iterator++;
-}, 4000);
-/***/
-
-
-
-const io = require('socket.io').listen(app.listen(3334, function(){
-    console.log('Listening');
+/* Starts server */
+const io = require('socket.io').listen(app.listen(port, function(){
+    console.log('Listening on', port);
 }));
 
-
-
-const message = 'message';
-const remove = 'remove';
-const highlight = 'highlight';
-
+/**
+ * [sends mesasge to specific room]
+ */
 const sendMessageToRoom = (room, id, data) => {
     io.sockets.in(room).emit(id, data);
-};
-
-const generateRandomString = (length) => {
-    var text = '';
-    var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    for (var i = 0; i < length; i++) {
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
-    }
-    return text;
-};
-
-const buildClientObject = (data) => {
-    data.uniqId = generateRandomString(32);
-    data.highlight = false;
-    return data;
-};
-
-const isChanelOpen = (i, channelName) => {
-    let reg = new RegExp(i, 'i');
-    return channelName.match(reg);
 };
 
 emitter.on('userQuestion', (data) => {
@@ -122,42 +88,38 @@ emitter.on('userQuestion', (data) => {
         }
     }
 });
-
-// req.params.roomId
+// admin view
 router.get('/admin/course/:courseId', function(req, res) {
-    res.render('index', {
+    res.render('admin', {
         courseId: req.params.courseId,
         item: '{{item.text}}',
-        index: '{{index}}',
-        admin: true
+        index: '{{index}}'
     });
 });
-
+// tv view
 router.get('/tv/course/:courseId', function(req, res) {
-    res.render('index', {
+    res.render('tv', {
         courseId: req.params.courseId,
         item: '{{item.text}}',
-        index: '{{index}}',
-        admin: false
+        index: '{{index}}'
     });
 });
 
-let i = 0;
 io.sockets.on('connection', function (socket) {
 
     socket.on('chanel', function(chanel) {
        socket.join(chanel);
     });
-
+    // revert old message
+    socket.on('revert', function(data){
+        sendMessageToRoom(data.room, message, data.item);
+    });
+    // remove message
     socket.on('remove', function(data){
         sendMessageToRoom(data.room, remove, data.uniqId);
     });
-
+    // highlight a message
     socket.on('highlight', function(data){
         sendMessageToRoom(data.room, highlight, data.uniqId);
     });
 });
-
-/*io.sockets.on('disconnect', function () {
-   console.log('disconnect client event....');
-});*/
