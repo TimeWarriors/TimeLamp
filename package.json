@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/TimeWarriors/TimeLamp#readme",
   "dependencies": {
+    "asyncawait": "^1.0.3",
     "body-parser": "^1.15.0",
     "co": "^4.6.0",
     "events": "^1.1.0",
@@ -24,8 +25,10 @@
     "express-handlebars": "^3.0.0",
     "file-cache-simple": "0.0.3",
     "fs-promise": "^0.4.1",
+    "jsonfile": "^2.2.3",
     "node-schedule": "^1.0.0",
     "socket.io": "^1.4.5",
-    "timeeditapi": "^2.0.0"
+    "timeeditapi": "^2.0.0",
+    "websocket": "^1.0.22"
   }
 }
