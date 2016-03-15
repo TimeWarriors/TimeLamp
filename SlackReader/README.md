@@ -30,7 +30,7 @@ to specify the coursecodes for those channels in the file <i>courses.json</i>. <
 
 
 ### What to do if one of the JSON-files gets undefined? ###
-<p>**In case of <i>channels.json</i> or <i>users.json</i> gets undefined.**</p>
+**<p>In case of <i>channels.json</i> or <i>users.json</i> gets undefined.</p>**
 1) Open file and erase all content. It will probably look something like this.
 ```
 undefined
