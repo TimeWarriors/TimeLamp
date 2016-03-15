@@ -1,15 +1,19 @@
 "use strict";
-
+//This is the where the color settings and also the values of the lamps is controlled.
+//There is a JSON file wich will contain all the colors and values.
+//The JSON file containing the data is called moduleSettings.json.
 let fs = require('fs-promise');
 let fileName = __dirname+"/modulesettings.json";
-
 const ModuleSettings = class {
     constructor() {
     }
-
-    // En funktion som gör en parse på settings.json så att alla andra funktioner kan använda sig
-    // utav den parsade variablen.
-    // Även error om något går fel.
+    //This function creates a parse of the lampSettings.json.
+    //It also saves the parsed content into a variable called fileParsed.
+    //Function will cast an error if one occur.
+    /**
+     * [parsedFile description]
+     * @return {[Promise]} [resolve a parsed content of a JSON file]
+     */
     parsedFile(){
         return new Promise((resolve, reject) => {
             fs.readFile(fileName, 'utf8').then((res) =>{
@@ -20,10 +24,11 @@ const ModuleSettings = class {
             });
         })
     }
-
-    // En funktion som retunerar alla settings i modulesettings.json.
-    // modulesettings.json innehåller alla tre stadier för lampan.
-    // Utaget, nästan uptaget och ledigt.
+    //This function returns all the settings in the moduleSettings.json file.
+    /**
+     * [getModuleSettings description]
+     * @return {[Promise]} [resolves an object containing objects]
+     */
     getModuleSettings(){
         return new Promise((resolve, reject) => {
              this.parsedFile().then((lampInfo) =>{
@@ -32,16 +37,6 @@ const ModuleSettings = class {
                 reject(error);
             });
         });
-
     }
 }
-
 module.exports = new ModuleSettings();
-
-// let moduleSettings = new ModuleSettings();
-//
-// moduleSettings.getModuleSettings().then((lampInfo) =>{
-//     console.log(JSON.stringify(lampInfo, null, 2));
-// }).catch((error) =>{
-//     console.log(error);
-// });
