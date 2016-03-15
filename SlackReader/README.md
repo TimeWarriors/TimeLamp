@@ -30,7 +30,7 @@ to specify the coursecodes for those channels in the file <i>courses.json</i>. <
 
 
 ### What to do if one of the JSON-files gets undefined? ###
-**If channels.json or users.json gets undefined.**<br />
+**In case of <i>channels.json</i> or <i>users.json</i> gets undefined.**<br />
 1) Open file and erase all content. It will probably look something like this.
 ```
 undefined
@@ -38,5 +38,20 @@ undefined
 2) Type in start- and endbrackets.
 ```
 []
+```
+3) Restart SlackReader.
+
+**In case of <i>courses.json</i> gets undefined.**<br />
+1) Open file and erase all content. It will probably look something like this.
+```
+undefined
+```
+2) Copy code from template below and paste in file.
+```
+{
+  "codes": [
+    "type coursecode here"
+  ]
+}
 ```
 3) Restart SlackReader.
