@@ -24,6 +24,21 @@ to specify the coursecodes for those channels in the file <i>courses.json</i>. <
 ```
 
 **Important!**
-  <p>The specified coursecode has to be included in the name of the created Slack-channel.</p><br />
+  The specified coursecode has to be included in the name of the created Slack-channel.<br />
   **Examples**: "1dv024-oop", "1dv406-asp_net-wf", "1dv405-databasteknik", "1dv42e-exjobbwpud".<br />
   (The coursecode doesn't have to be in the beginning of the name).
+
+
+### What to do if one of the JSON-files gets undefined? ###
+If channels.json or users.json gets undefined.
+1. Open file and erase all content. It will probably look something like example below.
+```
+undefined
+
+```
+2. Type in start- and endbrackets.
+```
+[]
+
+```
+3. Restart SlackReader.
