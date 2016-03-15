@@ -1,7 +1,7 @@
 ### How do I start up SlackReader? ###
 SlackReader will automatically start when TimeLamp is initiated.
  
-### How does SlackReader know which channels to check? ###
+### How does SlackReader know which channels to act on? ###
 If you want SlackReader to check one or more channels you will have 
 to specify the coursecodes for those channels in the file <i>courses.json</i>.
 See example below for clarification:
