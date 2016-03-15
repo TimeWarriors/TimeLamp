@@ -1,87 +1,87 @@
 'use strict';
 
+const UserHandler = require('./UserHandler.js');
 const ChannelHandler = require('./ChannelHandler.js');
-const MessageHandler = require('./MessageHandler.js');
 const WebSocketHandler = require('./WebSocketHandler.js');
-const slackConfig = require('../slackConfig.json');
 const https = require('https');
+const async = require('asyncawait/async');
+const await = require('asyncawait/await');
+const slackConfig = require('../slackConfig.json');
 const channelsFile = './channels.json';
 const Jsonfile = require('jsonfile');
-Jsonfile.spaces = 4;
-const WebSocketClient = require('websocket').client;
 
 
 const SlackAPI = class {
-    constructor() {
+
+    constructor(eventEmitter) {
+        this.userHandler = new UserHandler();
         this.channelHandler = new ChannelHandler();
-        this.messageHandler = new MessageHandler();
-        this.webSocketHandler = new WebSocketHandler();
+        this.webSocketHandler = new WebSocketHandler(eventEmitter);
         this.channels = Jsonfile.readFileSync(channelsFile);
+        this.startUp();
     }
 
-    updateChannelsFile() {
-        /* 1. Get all channels from Coursepress.
-         * 2. Sort out the channels we want.
-         * 3. Save those channels to file. */
-        this.channelHandler.getAllChannels()
-            .then(allChannels => {
-                return this.channelHandler.getChannels(allChannels);
-            })
-            .then(channels => {
-                this.channelHandler.saveChannels(channels);
-            })
-            .catch(error => {
+    /**
+     * Start up Slack Reader.
+     */
+    startUp() {
+        const startUp = async (() => {
+            await (this.updateChannelsFile());
+            await (this.updateUsersFile());
+            this.initWebSocket();
+        });
+        startUp();
+    }
+
+    /**
+     * Update 'users.json'. Save username and ID
+     * for all users in team "CoursePress".
+     */
+    updateUsersFile() {
+        const update = async (() => {
+            try {
+                let allUsers = await (this.userHandler.getAllUsers());
+                allUsers = this.userHandler.getDesiredUserProps(allUsers);
+                this.userHandler.saveUsers(allUsers);
+            } catch (error) {
                 console.log(error);
-            });
-    }
-
-    initWebSocket() {
-        this.webSocketHandler.getWebSocketURL()
-            .then(url => {
-                this.webSocketHandler.connectToWebSocket(url);
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-
-    /*
-    getMessages(courseCode, lectureStartTime) {
-        let channelID = this.getChannelID(this.channels, courseCode);
-
-        this.messageHandler.getMessages(channelID, lectureStartTime)
-            .then(messages => {
-                if (this.messageHandler.isNewMessagePosted(messages)) {
-                    messages = this.messageHandler.sortOutMessages(messages);
-                    this.messageHandler.handleMessages(messages);
-                } else {
-                    console.log('No new messages have been posted!');
-                }
-            })
-            .catch(error => {
-                console.log(error);
-            });
-    }
-    */
-
-    /*
-    getChannelID(channels, courseCode) {
-        for (let channel of channels) {
-            if (courseCode.includes(channel.courseCode)) {
-                return channel.id;
             }
-        }
+        });
+        update();
     }
-    */
 
-    convertToMilliseconds(time) {
-        // (time format = 'xx:xx')
-        let today = new Date();
-        today.setHours(time.substring(0, 2));
-        today.setMinutes(time.substring(3, 5));
-        today.setSeconds(0);
-        time = +today; // '+' Converts to milliseconds.
-        return time;
+    /**
+     * Update 'channels.json'. Save name, course-code, id,
+     * todays lecture start- and endtime for channels.
+     */
+    updateChannelsFile() {
+        const update = async (() => {
+            try {
+                const allChannels = await (this.channelHandler.getAllChannels());
+                let channels = this.channelHandler.getChannels(allChannels);
+                channels = await (this.channelHandler.getScheduleForChannels(channels));
+                channels = await (this.channelHandler.getLampIDForChannels(channels));
+                this.channelHandler.saveChannels(channels);
+            } catch (error) {
+                console.log(error);
+            }
+        });
+        update();
+    }
+
+    /**
+     * Establish connection to Slack WebSocket-server.
+     */
+    initWebSocket() {
+        const webSocket = async (() => {
+            try {
+                const url = await (this.webSocketHandler.getWebSocketURL());
+                this.webSocketHandler.connectToWebSocket(url);
+            } catch (error) {
+                console.log(error);
+            }
+        });
+        webSocket();
     }
 
 };

@@ -1,11 +1,13 @@
 {
   "name": "SlackReader",
   "version": "1.0.0",
-  "description": "Get Slack chatmessages and handle hashtags.",
+  "description": "Listen to Slack channels and handle messages.",
   "main": "app.js",
   "author": "Wictor Kihlbaum",
   "dependencies": {
+    "asyncawait": "^1.0.3",
     "jsonfile": "^2.2.3",
+    "timeeditapi": "^2.1.1",
     "websocket": "^1.0.22"
   }
 }
