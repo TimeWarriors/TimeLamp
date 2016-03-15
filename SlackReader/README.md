@@ -7,7 +7,7 @@ However, SlackReader won't do anything more than that if you don't tell it to.
 
 If you want SlackReader to act on one or more specific channels you will have 
 to specify the coursecodes for those channels in the file <i>courses.json</i>.
-See example below for clarification:
+**See example below for clarification:**
 
 ```
 {
