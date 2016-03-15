@@ -3,7 +3,7 @@ SlackReader will automatically start when TimeLamp is initiated.
  
 ### How does SlackReader know which channels to act on? ###
 SlackReader is listening on all channels in team "CoursePress". 
-However, SlackReader wont do anything more than that if you don't tell it to.
+However, SlackReader won't do anything more than that if you don't tell it to.
 
 If you want SlackReader to act on one or more specific channels you will have 
 to specify the coursecodes for those channels in the file <i>courses.json</i>.
