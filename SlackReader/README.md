@@ -41,7 +41,7 @@ undefined
 ```
 3) Restart SlackReader.
 
-<p>**In case of <i>courses.json</i> gets undefined.**</p>
+**<p>In case of <i>courses.json</i> gets undefined.</p>**
 1) Open file and erase all content. It will probably look something like this.
 ```
 undefined
