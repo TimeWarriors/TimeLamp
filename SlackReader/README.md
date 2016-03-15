@@ -1,9 +1,9 @@
-# How do I start up SlackReader? #
+## How do I start up SlackReader? ##
 <p>SlackReader will automatically start when TimeLamp is initiated.</p>
  
-# How does SlackReader know which channels to check?#
+## How does SlackReader know which channels to check? ##
 <p>If you want SlackReader to check one or more channels you will have 
-to specify the coursecodes for those channels in the file *courses.json*.
+to specify the coursecodes for those channels in the file <i>courses.json</i>.
 See example below for clarification:</p>
 
 ```
@@ -22,5 +22,5 @@ See example below for clarification:</p>
 
 **Important!**
   <p>The specified coursecode has to be included in the name of the created Slack-channel.</p>
-  Examples: "1dv024-oop", "1dv406-asp_net-wf", "1dv405-databasteknik", "1dv42e-exjobbwpud".
+  Examples: "1dv024-oop", "1dv406-asp_net-wf", "1dv405-databasteknik", "1dv42e-exjobbwpud".<br />
   (The coursecode doesn't have to be in the beginning of the name).
