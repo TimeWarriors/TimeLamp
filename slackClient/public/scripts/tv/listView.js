@@ -12,9 +12,10 @@ client.listView = function(){
         methods: {
             updateMessages: function(message){
                 if(this.isHashTagWarning(message.hashTags)){
-                    client.modalView.openWarningModal(message);
+                    console.log(message);
+                    client.modalView(message,  { pulse:true, backgroundColor: '#ed6c63', isWarning: true, maxContent: false});
                 }else{
-                    client.modalView.closeWarningModal();
+                    client.closeWarningModal();
                 }
                 message.itemLabel = this.getItemLabelClass(message.hashTags);
 
@@ -24,7 +25,6 @@ client.listView = function(){
                 }else{
                     this.items.push(message);
                 }
-
             },
 
             isOverflow: function(el){
@@ -48,10 +48,12 @@ client.listView = function(){
                 }).forEach(function(item){
                     if(!item.highlight){
                         item.highlight = 'myHighlight';
+                        client.modalView(item, { pulse:false, maxContent: true});
                     }else{
+                        client.closeOpenModal();
                         item.highlight = false;
                     }
-                });
+                }.bind(this));
             },
 
             removeMessage: function(uniqId){

@@ -25,7 +25,7 @@ client.oldMessageView = function(){
             },
 
             toggleMessage: function(item){
-                client.modalView.openModal(item);
+                client.modalView(item, this);
             },
 
             toggleList: function(){
