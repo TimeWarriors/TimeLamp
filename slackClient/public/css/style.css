@@ -181,6 +181,7 @@ html{
 }
 
 #closeList{
+    border-bottom: 1px solid lightgray;
     padding-left: 16px;
     -webkit-touch-callout: none;
     -webkit-user-select: none;

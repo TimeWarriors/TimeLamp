@@ -3,6 +3,14 @@
     display: none;
 }
 
+.largeBox{
+    max-height: 100vh;
+    height: 90vh;
+    width: 94vw;
+    font-size: 2.5vw;
+    overflow: hidden;
+}
+
 .pulse {
     animation-name: pulseAnim;
     animation-duration: 1s;
@@ -20,6 +28,11 @@
     100% {
         background-color: rgba(237,108,99, 0.86);
     }
+}
+
+.modalHeight2 {
+    height: 80vh;
+    font-size: 2.5vw;
 }
 
 .modalBox{
@@ -43,7 +56,7 @@
 }
 
 .warningLabel{
-    background: rgba(237,108,99, 0.86) !important;
+    border-top: 6px solid rgba(237,108,99, 0.86);
     color: black;
 }
 
