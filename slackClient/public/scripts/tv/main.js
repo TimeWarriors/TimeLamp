@@ -9,11 +9,8 @@ client.init = function(){
 
     client.id = document.querySelector('#courseId').dataset.courseId;
     client.connect();
-
-    client.modalView = client.modalView();
     var listView = client.listView();
-
-
+    
     client.onMessage(listView.updateMessages);
     client.onRemove(listView.removeMessage);
     client.onHighlight(listView.highlightMessage);
