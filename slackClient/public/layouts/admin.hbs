@@ -74,28 +74,33 @@
 
 
     <!-- specific message view -->
-    <section id="modalView">
-        <div class="modal" v-el:modal>
-            <div class="modal-background" v-on:click="closeModal()"></div>
-            <div class="modal-container modalBox">
-                <div class="box">
-                    <div class="modal-content">
-                        <div class="columns modalHeight">
-                            <div class="column is-10" v-el:modal-text></div>
-                            <button class="column button is-warning" v-on:click="revertMessage()">revert</button>
+    <div id="modalPresentation" >
+    </div>
+
+    <template id="modalViewTemp">
+        <section id="modalView">
+            <div class="modal is-active" v-el:modal>
+                <div v-el:modal-background class="modal-background" v-on:click="closeSelf()"></div>
+                <div class="modal-container modalBox">
+                    <div class="box">
+                        <div class="modal-content">
+                            <div class="columns modalHeight">
+                                <div class="column is-10" v-el:modal-text></div>
+                                <button class="column button is-warning" v-on:click="revertMessage()">revert</button>
+                            </div>
                         </div>
                     </div>
                 </div>
+                <button class="modal-close" v-on:click="closeSelf()"></button>
             </div>
-            <button class="modal-close" v-on:click="closeModal()"></button>
-        </div>
-    </section>
+        </section>
+    </template>
 
     <div id="courseId" data-course-Id="{{courseId}}"></div>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.17/vue.min.js"></script>
     <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
     <script src="/scripts/admin/listView.js"></script>
-    <script src="/scripts/modalView.js"></script>
+    <script src="/scripts/admin/modalView.js"></script>
     <script src="/scripts/admin/oldMessages.js"></script>
     <script src="/scripts/admin/main.js"></script>
 </body>
