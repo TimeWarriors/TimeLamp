@@ -7,7 +7,7 @@ const ModuleLoader = require('./mouduleLoader/moduleLoader.js');
 const nodeSchedule = require('./nodeSchdule/nodeSchedule.js');
 const eventEmitter = require('./eventEmitter/eventEmitter.js');
 const LightHandler = require('./lightHandler/lightHandler.js');
-const settings = require('./settings/settings.js');
+const settings = require('./settings/lampSettings.js');
 const TimeeditDAL = require('./timeeditDAL/timeeditDAL.js');
 
 const lightHandler = new LightHandler();
