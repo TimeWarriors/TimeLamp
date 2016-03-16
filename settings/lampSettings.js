@@ -3,7 +3,7 @@
 //There is a JSON file wich will contain the type of the lamp, the lampId and also the roomId.
 //The JSON file containing the data is called lampSettings.json.
 let fs = require('fs-promise');
-let fileName = __dirname+"/settings.json";
+let fileName = __dirname+"/lampSettings.json";
 const Settings = class {
     constructor() {
     }
