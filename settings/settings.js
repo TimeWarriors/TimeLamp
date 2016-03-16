@@ -1,20 +1,19 @@
 "use strict";
-
-// Här sköts inställningarna på lamporna. Vi kommer ha inställningar för både Blink(1) mk 2
-// och för Philips hue lampan. Vi har en JSON fil som kommer innehålla information om TYP, lampId och romId.
-
-// settings.json - I JSON filen finns alla lampor som existerar.
-
+//This is the where the main settings of the lamps is controlled.
+//There is a JSON file wich will contain the type of the lamp, the lampId and also the roomId.
+//The JSON file containing the data is called lampSettings.json.
 let fs = require('fs-promise');
 let fileName = __dirname+"/settings.json";
-
 const Settings = class {
     constructor() {
     }
-
-    // En funktion som gör en parse på settings.json så att alla andra funktioner kan använda sig
-    // utav den parsade variablen.
-    // Även error om något går fel.
+    //This function creates a parse of the lampSettings.json.
+    //It also saves the parsed content into a variable called fileParsed.
+    //Function will cast an error if one occur.
+    /**
+     * [parsedFile description]
+     * @return {[Promise]} [resolves a parsed content of a JSON file]
+     */
     parsedFile(){
         return new Promise(function(resolve, reject) {
             fs.readFile(fileName, 'utf8').then((res) =>{
@@ -25,17 +24,19 @@ const Settings = class {
             });
         })
     }
-
-    // En funktion som hämtar ut alla lampor som finns av den typen.
-    // Om man skickar in typen hue får man ut alla Philips hue lampor
-    // Samma gäller för blink lamporna.
+    //This function GET's all the lamps of a specific type.
+    //Function will cast an error if one occur.
+    /**
+     * [getLamps description]
+     * @param  {[string]} type [string from lampSettings.json]
+     * @return {[Promise]}     [resolves a list with objects cointaining the type]
+     */
     getLamps(type){
         return new Promise((resolve, reject) => {
             this.parsedFile().then((file) => {
                 let filterdType = file.filter((lamp)  =>{
                     return lamp.type === type;
                 });
-
                 if(filterdType.length === 0){
                     reject("Type was not fund.");
                 }
@@ -45,17 +46,20 @@ const Settings = class {
             })
         });
     }
-
-    // En funktion som hämtar ut alla lampor som finns på rumId som man skickar in.
-    // Om man skickar in rummet 105 så får man ut alla lampObjekt som finns på det här rummet.
-    // Om idt inte finns eller är tomt, så skickars felmedelandet ut.
+    //This function GET's all lamps wich exists in a room.
+    //This is decided by the roomId.
+    //If the id dose not exist or the id is empthy the function will cast an error.
+    /**
+     * [getLampsinRoom description]
+     * @param  {[string]} roomId [string from lampSettings.json]
+     * @return {[Promise]}       [resolves a list with objects cointaining the roomId]
+     */
     getLampsinRoom(roomId){
         return new Promise((resolve, reject) => {
             this.parsedFile().then((file) => {
                 let filterdRoom = file.filter((room) =>{
                     return room.roomId === roomId;
                 });
-
                  if(filterdRoom.length === 0){
                      reject("The room was not found");
                  }
@@ -65,18 +69,20 @@ const Settings = class {
             })
         });
     }
-
-    // En funktion som hämtar ut alla lampor som finns på lampId som man skickar in.
-    // En lampa borde ha ett unikt id då man oftast vill att lamporna ska ha olika
-    // funktionalitet och bokningar.
-    // Om lampans Id inte finns kommer felmedelandet skrivas ut.
+    //This function GET's all the lamps wich exist on a lampId.
+    //This is decided by the lampId.
+    //If the lampId do not exist the function will cast an error.
+    /**
+     * [getIdOnLamps description]
+     * @param  {[string]} lampId [string from lampSettings.json]
+     * @return {[Promise]}       [resolves a list with objects cointaining the lampId]
+     */
     getIdOnLamps(lampId){
         return new Promise((resolve, reject) => {
             this.parsedFile().then((file) => {
                 let filterdLamp = file.filter((lamp) =>{
                     return lamp.lampId === lampId;
                 });
-
                  if(filterdLamp.length === 0){
                      reject("The lamp was not found");
                  }
@@ -87,28 +93,4 @@ const Settings = class {
         });
     }
 }
-
 module.exports = new Settings();
-
-    // Test kod som testar de olika funtionerna med hårdkodade värden.
-    // Även alla id som är i settings.json är hårdkodade.
-    // 
-    // let setting = new Settings();
-    //
-    // setting.getLamps("hue").then((types) =>{
-    //     console.log(JSON.stringify(types, null, 2));
-    // }).catch((error) =>{
-    //     console.log(error);
-    // });
-    //
-    // setting.getLampsinRoom("ny105").then((rooms) =>{
-    //     console.log(JSON.stringify(rooms, null, 2));
-    // }).catch((error) =>{
-    //     console.log(error);
-    // })
-    //
-    // setting.getIdOnLamps("XXX").then((lamps) =>{
-    //     console.log(JSON.stringify(lamps, null, 2));
-    // }).catch((error) =>{
-    //     console.log(error);
-    // })

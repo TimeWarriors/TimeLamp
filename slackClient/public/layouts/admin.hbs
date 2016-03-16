@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.0.16/css/bulma.min.css" rel="stylesheet"  media="screen" >
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link href="/css/style.css" rel="stylesheet" media="screen">
+    <title>Admin on: {{courseId}}</title>
+</head>
+<body>
+
+    <header class="header">
+        <div class="container">
+
+            <div class="header-left"></div>
+
+            <!-- mobile -->
+            <span class="header-toggle">
+                <a class="header-item" href="#">
+                    <img src="/images/lnu_logo.png" alt="Logo">
+                </a>
+            </span>
+
+            <!-- Right side -->
+            <div class="header-right header-menu">
+                <a class="header-item" href="#">
+                    <img src="/images/lnu_logo.png" alt="Logo">
+                </a>
+
+            </div>
+        </div>
+    </header>
+
+    <!-- old items view -->
+    <section id="oldItems">
+        <div class="openMenu" v-if="showOpenMenu">
+            <span class="material-icons mdl-badge">
+                <i v-on:click="toggleList" class="material-icons closeListFont">history</i>
+            </span>
+        </div>
+        <div class="listWrap" v-if="show" transition="expand" v-cloak>
+            <div id="closeList">
+                <i v-on:click="toggleList" class="material-icons closeListFont">history</i>
+            </div>
+            <div class="list">
+                <ul>
+                    <li v-for="item in items" v-on:click="toggleMessage(item)">
+                        <div class="oldMessMenuInfoWrap">{{item}}</div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- new messages view -->
+    <section class="columns is-mobile ">
+        <div id="listView" class="container column is-11 is-offset-1">
+            <ul>
+                <li v-for="(index, item) in items" v-on:click="highlightMessageClick(item)" :class="[item.highlight, item.itemLabel]" id="listViewLi{{index}}" transition="expandheight" v-cloak>
+                    <section class="section">
+                        <div class="container">
+                            <div class="columns is-mobile">
+                                <div class="column is-11">{{item}}</div>
+                                <button :class="[item.buttonOutline]" class="column button is-outlined" v-on:click="removeMessageClick(item)">X</button>
+                            </div>
+
+                        </div>
+                    </section>
+                </li>
+            </ul>
+        </div>
+    </section>
+
+
+    <!-- specific message view -->
+    <div id="modalPresentation" >
+    </div>
+
+    <template id="modalViewTemp">
+        <section id="modalView">
+            <div class="modal is-active" v-el:modal>
+                <div v-el:modal-background class="modal-background" v-on:click="closeSelf()"></div>
+                <div class="modal-container modalBox">
+                    <div class="box">
+                        <div class="modal-content">
+                            <div class="columns modalHeight">
+                                <div class="column is-10" v-el:modal-text></div>
+                                <button class="column button is-warning" v-on:click="revertMessage()">revert</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="modal-close" v-on:click="closeSelf()"></button>
+            </div>
+        </section>
+    </template>
+
+    <div id="courseId" data-course-Id="{{courseId}}"></div>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.17/vue.min.js"></script>
+    <script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+    <script src="/scripts/admin/listView.js"></script>
+    <script src="/scripts/admin/modalView.js"></script>
+    <script src="/scripts/admin/oldMessages.js"></script>
+    <script src="/scripts/admin/main.js"></script>
+</body>
+</html>
