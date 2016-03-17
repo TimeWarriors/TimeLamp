@@ -14,11 +14,7 @@ to specify the coursecodes for those channels in the file *[courses.json](https:
   "codes": [
     "1dv409",
     "1dv405",
-    "1dv450",
-    "1dv438",
-    "1dv411",
-    "1dv023",
-    "1dv024"
+    "1dv450"
   ]
 }
 ```
@@ -30,7 +26,7 @@ to specify the coursecodes for those channels in the file *[courses.json](https:
 
 
 ### What to do if one of the JSON-files gets undefined? ###
-**<p>In case of *[channels.json](https://github.com/TimeWarriors/TimeLamp/blob/master/SlackReader/courses.json)*. or *[users.json](https://github.com/TimeWarriors/TimeLamp/blob/master/SlackReader/courses.json)*. gets undefined.</p>**
+**<p>In case of *[channels.json](https://github.com/TimeWarriors/TimeLamp/blob/master/SlackReader/courses.json)* or *[users.json](https://github.com/TimeWarriors/TimeLamp/blob/master/SlackReader/courses.json)* gets undefined.</p>**
 1) Open file and erase all content. It will probably look something like this.
 ```
 undefined
