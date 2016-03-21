@@ -1,5 +1,9 @@
 ### How do I start up SlackReader?
 SlackReader will automatically start when TimeLamp is initiated.
+
+
+***
+
  
 ### How does SlackReader know which channels to act on?
 SlackReader is listening on all channels in team "CoursePress". 
@@ -63,10 +67,13 @@ undefined
 ### Things to keep in mind for the future
 SlackReader has a couple of dependencies to other softwares which may cause it to stop working properly if the developers of those softwares decide to make changes to their code.
 
-**Things to check if SlackReader stops working properly:**
-* Slack (RTM) API.
+**Things to investigate if SlackReader stops working properly:**
+* Slack (Real Time Message) API.
 * TimeWarriors TimeEdit API
- * TimeEdit
+ * Official TimeEdit Service
 
+**Slack API**
+This is probably a minor risk but still a risk. If the developers behind Slacks API decide to make major changes to their API and stops supporting the existing API-code which SlackReader uses.
 
-#### TimeEdit
+**TimeEdit**
+One of the major risks is all code related to TimeEdit. SlackReader uses the TimeWarriors TimeEdit API which is a webscraper, and is (of obvious reasons) dependent on the code of the official TimeEdit-service. If this happens start by updating the TimeWarriors TimeEdit API to support the new TimeEdit codestructure. When this is done update the code in SlackReader if needed.
