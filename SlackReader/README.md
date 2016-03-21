@@ -25,6 +25,9 @@ to specify the coursecodes for those channels in the file *[courses.json](https:
   (The coursecode doesn't have to be in the beginning of the name).
 
 
+***
+
+
 ### What to do if one of the JSON-files gets undefined?
 **<p>In case of *[channels.json](https://github.com/TimeWarriors/TimeLamp/blob/master/SlackReader/courses.json)* or *[users.json](https://github.com/TimeWarriors/TimeLamp/blob/master/SlackReader/courses.json)* gets undefined.</p>**
 1) Open file and erase all content. It will probably look something like this.
@@ -37,7 +40,8 @@ undefined
 ```
 3) Restart SlackReader.
 
-**<p>In case of <i>courses.json</i> gets undefined.</p>**
+**<p>In case of *[courses.json](https://github.com/TimeWarriors/TimeLamp/blob/master/SlackReader/courses.json)* gets undefined.</p>**
+
 1) Open file and erase all content. It will probably look something like this.
 ```
 undefined
@@ -53,10 +57,16 @@ undefined
 3) Restart SlackReader.
 
 
+***
+
+
 ### Things to keep in mind for the future
 SlackReader has a couple of dependencies to other softwares which may cause it to stop working properly if the developers of those softwares decide to make changes to their code.
 
-**Things to check:**
+**Things to check if SlackReader stops working properly:**
 * Slack (RTM) API.
 * TimeWarriors TimeEdit API
  * TimeEdit
+
+
+#### TimeEdit
