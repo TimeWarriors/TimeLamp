@@ -68,8 +68,8 @@ undefined
 SlackReader has a couple of dependencies to other softwares which may cause it to stop working properly if the developers of those softwares decide to make changes to their code.
 
 **Things to investigate if SlackReader stops working properly:**
-* Slack (Real Time Message) API.
-* TimeWarriors TimeEdit API
+* [Slack (Real Time Message) API](https://api.slack.com/rtm)
+* [TimeWarriors TimeEdit API](https://github.com/TimeWarriors/TimeEdit)
  * Official TimeEdit Service
 
 ##### Slack API
