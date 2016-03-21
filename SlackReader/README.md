@@ -77,9 +77,3 @@ This is probably a minor risk but still a risk. If the developers behind Slacks 
 
 ##### TimeEdit
 One of the major risks is all code related to TimeEdit. SlackReader uses the TimeWarriors TimeEdit API which is a webscraper, and is (of obvious reasons) dependent on the code of the official TimeEdit-service. If this happens start by updating the TimeWarriors TimeEdit API to support the new TimeEdit code-structure. When this is done update the code in SlackReader if needed.
-
-
-**Examples of functions which may cuase trouble if something change in the future:**
-
-* *getAllChannels* in *channels.json*
-* *getScheduleForChannels* in *channels.json*.
