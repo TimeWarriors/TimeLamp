@@ -1,15 +1,15 @@
 'use strict';
 
+const Jsonfile = require('jsonfile');
+const usersFile = require('../users.json');
+const channelsFile = require('../channels.json');
 const slackConfig = require('../slackConfig.json');
 const lampConfig = require('../lampConfig.json');
-const https = require('https');
 const hashTags = require('../hashtags.json');
-const channelConfig = require('../channels.json');
+const https = require('https');
 const LightHandler = require('../../lightHandler/lightHandler.js');
 const async = require('asyncawait/async');
 const await = require('asyncawait/await');
-const Jsonfile = require('jsonfile');
-const usersFile = require('../users.json');
 
 
 const MessageHandler = class {
@@ -26,9 +26,8 @@ const MessageHandler = class {
     setupCoolDownCounters() {
         this.coolDownCounters = {};
         this.elements = [];
-        const channels = Jsonfile.readFileSync('./channels.json');
 
-        for (let channel of channels) {
+        for (let channel of channelsFile) {
             this.elements.push(channel.id);
         }
 
@@ -38,12 +37,12 @@ const MessageHandler = class {
     }
 
     /**
-     * Initiate cooldown-effect for Philips Hue.
+     * Initiate cooldown-effect for channel.
      *
      * @param channelID
      */
     initCoolDown(channelID) {
-        this.coolDownCounters[channelID] = 15;
+        this.coolDownCounters[channelID] = lampConfig.coolDown;
         setInterval(() => {
             if (this.coolDownCounters[channelID] > 0)
                 this.coolDownCounters[channelID] -= 1;
@@ -64,12 +63,11 @@ const MessageHandler = class {
             msg.hasOwnProperty('text') &&
             msg.text.includes('#')) {
 
-            // TODO: Uncomment for live-filtering!
-            //if (this.isLectureLive(msg)) {
+            if (this.isLectureLive(msg)) {
                 msg = this.sortValidHashTags(msg);
                 if (msg.hasOwnProperty('hashTags'))
                     this.handleValidHashTags(msg);
-            //}
+            }
         }
     }
 
@@ -80,30 +78,37 @@ const MessageHandler = class {
      * @returns {boolean}
      */
     isLectureLive(message) {
-        const messageTimeStamp = message.ts;
-        let lectureStartTime;
-        let lectureEndTime;
+        const messageTimeStamp = this.getPresentTime();
+        let lectureStartTime, lectureEndTime;
+        const channel = channelsFile.find(element => element.id == message.channel);
 
-        for (let channel of channelConfig) {
-            if (channel.id === message.channel) {
-                if (message.hasOwnProperty('todayStartTime') &&
-                    message.hasOwnProperty('todayEndTime')) {
-                    lectureStartTime = channel.todayStartTime;
-                    lectureEndTime = channel.todayEndTime;
-                }
-            }
+        // Get lecture start- and endtime for channel.
+        if (channel.hasOwnProperty('todayStartTime') &&
+            channel.hasOwnProperty('todayEndTime')) {
+            lectureStartTime = channel.todayStartTime;
+            lectureEndTime = channel.todayEndTime;
         }
 
         if (lectureStartTime && lectureEndTime) {
             lectureStartTime = this.convertToMilliseconds(lectureStartTime);
             lectureEndTime = this.convertToMilliseconds(lectureEndTime);
 
-            if (messageTimeStamp >= lectureStartTime &&
-                messageTimeStamp <= lectureEndTime) {
+            // Check if message has been sent during lecture-time.
+            if (messageTimeStamp > lectureStartTime &&
+                messageTimeStamp < lectureEndTime) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Get present time in milliseconds.
+     *
+     * @returns {Date}
+     */
+    getPresentTime() {
+        return new Date().getMilliseconds();
     }
 
     /**
@@ -139,7 +144,7 @@ const MessageHandler = class {
         }
 
         if (validHashTags.length > 0)
-            message["hashTags"] = validHashTags;
+            message['hashTags'] = validHashTags;
 
         return message;
     }
@@ -196,12 +201,16 @@ const MessageHandler = class {
         const userName = self.getUserName(message.user);
         self.postBotMessageToChannel(channelID, botMessage, userName);
 
-        if (self.coolDownCounters[channelID] == 0) {
+        /* Uncomment if you don't want to override cooldown if problem occurs. */
+        //if (self.coolDownCounters[channelID] == 0) {
             self.initCoolDown(channelID);
-            const lampID = self.getLampID(message);
+            const lampIDs = self.getLampIDs(message.channel);
             const lampColor = lampConfig.problemColor;
-            self.callLightHandler(lampID, lampColor);
-        }
+            // If a lecture-room has several Philips Hue-lamps.
+            for (let lampID of lampIDs) {
+                self.callLightHandler(lampID.lampId, lampColor);
+            }
+        //}
     }
 
     /**
@@ -219,16 +228,19 @@ const MessageHandler = class {
 
         if (self.coolDownCounters[channelID] == 0) {
             self.initCoolDown(channelID);
-            const lampID = self.getLampID(message);
+            const lampIDs = self.getLampIDs(message.channel);
             const lampColor = lampConfig.questionColor;
-            self.callLightHandler(lampID, lampColor);
+            // If a lecture-room has several Philips Hue-lamps.
+            for (let lampID of lampIDs) {
+                self.callLightHandler(lampID.lampId, lampColor);
+            }
         }
 
         // Add channel-name to message.
         const channelName = self.getChannelName(channelID);
         message["channelName"] = channelName;
 
-        //this.eventEmitter.emit('userQuestion', message);
+        this.eventEmitter.emit('userQuestion', message);
     }
 
     /**
@@ -246,33 +258,25 @@ const MessageHandler = class {
     }
 
     /**
-     * Search 'channels.json' for lamp-ID by channel-ID.
+     * Get lamp-IDs for channel by its ID.
      *
-     * @param message
+     * @param channelID
      * @returns {*}
      */
-    getLampID(message) {
-        const channelID = message.channel;
-
-        for (let channel of channelConfig) {
-            if (channelID == channel.id) {
-                return channel.lampID;
-            }
-        }
+    getLampIDs(channelID) {
+        const channel = channelsFile.find(element => element.id == channelID);
+        if (channel) return channel.lampIDs;
     }
 
     /**
-     * Get channel-name by channel-ID.
+     * Get channel-name by its ID.
      * 
      * @param channelID
      * @returns {*}
      */
     getChannelName(channelID) {
-        for (let channel of channelConfig) {
-            if (channel.id == channelID) {
-                return channel.name;
-            }
-        }
+        const channel = channelsFile.find(element => element.id == channelID);
+        if (channel) return channel.name;
     }
 
     /**
@@ -282,11 +286,8 @@ const MessageHandler = class {
      * @returns {string}
      */
     getUserName(userID) {
-        for (let user of usersFile) {
-            if (user.id === userID) {
-                return user.name;
-            }
-        }
+        const user = usersFile.find(element => element.id == userID);
+        if (user) return user.name;
     }
 
     /**
@@ -305,8 +306,7 @@ const MessageHandler = class {
     }
 
     /**
-     * POST Bot-response to channel
-     * in which message has been sent.
+     * POST Bot-response to channel in which message has been sent.
      *
      * @param channel
      * @param botMessage
@@ -329,8 +329,9 @@ const MessageHandler = class {
         };
 
         const req = https.request(options, res => {
-            console.log(res.statusCode);
-            console.log(res.statusMessage);
+            if (res.statusCode == 200)
+                console.log('Bot-message has been successfully sent!');
+            else console.log('Bot-message could not be sent.');
         });
         req.end();
 

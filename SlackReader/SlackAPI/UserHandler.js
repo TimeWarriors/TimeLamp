@@ -14,6 +14,11 @@ const UserHandler = class {
         // Empty.
     }
 
+    /**
+     * GET all users from team "CoursePress".
+     *
+     * @returns {Promise}
+     */
     getAllUsers() {
         return new Promise((resolve, reject) => {
             const path =
@@ -45,7 +50,13 @@ const UserHandler = class {
         });
     }
 
-    getDesiredUserProps(users) {
+    /**
+     * Save the needed user-properties.
+     *
+     * @param users
+     * @returns {Array}
+     */
+    sortOutUserProps(users) {
         users = users.members;
         let userProps = [];
 
@@ -59,6 +70,11 @@ const UserHandler = class {
         return userProps;
     }
 
+    /**
+     * Save users to 'users.json'.
+     *
+     * @param users
+     */
     saveUsers(users) {
         Jsonfile.spaces = 4;
         Jsonfile.writeFileSync(usersFile, users);
