@@ -1,6 +1,6 @@
 'use strict';
 
-const coursesFile = './courses.json';
+const coursesFile = require('../courses.json');
 const channelsFile = './channels.json';
 const slackConfig = require('../slackConfig.json');
 const https = require('https');
@@ -14,9 +14,8 @@ const TimeLamp = require('../../settings/settings.js');
 const ChannelHandler = class {
 
     constructor() {
-        this.courses = Jsonfile.readFileSync(coursesFile);
-        this.timeEditApi = new TimeEditApi(
-            'https://se.timeedit.net/web/lnu/db1/schema1/', 5);
+        const timeEditURL = 'https://se.timeedit.net/web/lnu/db1/schema1/';
+        this.timeEditApi = new TimeEditApi(timeEditURL, 5);
     }
 
     /**
@@ -45,7 +44,6 @@ const ChannelHandler = class {
 
                 res.on('end', () => {
                     let body = Buffer.concat(chunks);
-                    console.log(JSON.parse(body));
                     resolve(JSON.parse(body));
                 });
             });
@@ -63,12 +61,12 @@ const ChannelHandler = class {
      * @param allChannels
      * @returns {Array}
      */
-    getChannels(allChannels) {
-        const courseCodes = this.courses.codes;
+    sortOutChannels(allChannels) {
+        //const courseCodes = this.courses.codes;
         allChannels = allChannels.channels;
         let channels = [];
 
-        for (let code of courseCodes) {
+        for (let code of coursesFile) {
             for (let channel of allChannels) {
                 if (channel.name.includes(code)) {
                     const channelProps = {
@@ -84,7 +82,7 @@ const ChannelHandler = class {
     }
 
     /**
-     * Update 'channel.json' and add schedule
+     * Update 'channels.json' and add schedule
      * for all relevant channels.
      *
      * @param channels
@@ -94,32 +92,17 @@ const ChannelHandler = class {
         for (let channel of channels) {
             const schedule = await (
                 this.timeEditApi.getTodaysSchedule(channel.courseCode));
-            // Verify that schedule time-property is defined.
-            if (this.isTimeDefined(schedule[0], 'booking', 'time')) {
-                const lectureRoom = schedule[0].booking.columns[2];
-                const startTime = schedule[0].booking.time.startTime;
-                const endTime = schedule[0].booking.time.endTime;
-                channel['lectureRoom'] = lectureRoom;
-                channel['todayStartTime'] = startTime;
-                channel['todayEndTime'] = endTime;
-            }
-        }
-        return channels;
-    }
 
-    /**
-     * Save room lamp-ID for all channels.
-     *
-     * @param channels
-     * @returns {*}
-     */
-    getLampIDForChannels(channels) {
-        for (let channel of channels) {
-            if (channel.hasOwnProperty('lectureRoom')) {
-                const room = channel.lectureRoom.toLowerCase().substring(0, 4);
-                let lampIDs = await (this.TimeLamp.getLampsinRoom(room));
-                lampIDs = lampID[0].lampId; // TODO: Make array. It can have several.
-                channel['lampID'] = lampIDs;
+            /* Verify that schedule "time"-property is defined */
+            if (this.isTimeDefined(schedule[0], 'booking', 'time')) {
+                if (schedule[0].booking.columns[5] == 'Föreläsning') {
+                    const lectureRoom = schedule[0].booking.columns[2];
+                    const startTime = schedule[0].booking.time.startTime;
+                    const endTime = schedule[0].booking.time.endTime;
+                    channel['lectureRoom'] = lectureRoom;
+                    channel['todayStartTime'] = startTime;
+                    channel['todayEndTime'] = endTime;
+                }
             }
         }
         return channels;
@@ -136,16 +119,32 @@ const ChannelHandler = class {
         const args = Array.prototype.slice.call(arguments, 1);
 
         for (let arg of args) {
-            if (!schedule.hasOwnProperty(arg)) {
-                return false;
-            }
+            if (!schedule.hasOwnProperty(arg)) return false;
             schedule = schedule[arg];
         }
         return true;
     }
 
     /**
-     * Save channels to 'channel.json'.
+     * Save room lamp-ID for all channels.
+     *
+     * @param channels
+     * @returns {*}
+     */
+    getLampIDsForChannels(channels) {
+        for (let channel of channels) {
+            if (channel.hasOwnProperty('lectureRoom')) {
+                // Exclude 'K' in room-name. 'getLampsinRoom' won't work otherwise.
+                const room = channel.lectureRoom.toLowerCase().substring(0, 4);
+                const lampIDs = await (this.TimeLamp.getLampsinRoom(room));
+                channel['lampIDs'] = lampIDs;
+            }
+        }
+        return channels;
+    }
+
+    /**
+     * Save channels to 'channels.json'.
      *
      * @param channels
      */

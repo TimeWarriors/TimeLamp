@@ -41,7 +41,7 @@ const SlackAPI = class {
         const update = async (() => {
             try {
                 let allUsers = await (this.userHandler.getAllUsers());
-                allUsers = this.userHandler.getDesiredUserProps(allUsers);
+                allUsers = this.userHandler.sortOutUserProps(allUsers);
                 this.userHandler.saveUsers(allUsers);
             } catch (error) {
                 console.log(error);
@@ -51,16 +51,16 @@ const SlackAPI = class {
     }
 
     /**
-     * Update 'channels.json'. Save name, course-code, id,
-     * todays lecture start- and endtime for channels.
+     * Update 'channels.json'. Save name, course-code, id, lecture-room,
+     * todays lecture start- and endtime, lamp-id for channels.
      */
     updateChannelsFile() {
         const update = async (() => {
             try {
                 const allChannels = await (this.channelHandler.getAllChannels());
-                let channels = this.channelHandler.getChannels(allChannels);
+                let channels = this.channelHandler.sortOutChannels(allChannels);
                 channels = await (this.channelHandler.getScheduleForChannels(channels));
-                channels = await (this.channelHandler.getLampIDForChannels(channels));
+                channels = await (this.channelHandler.getLampIDsForChannels(channels));
                 this.channelHandler.saveChannels(channels);
             } catch (error) {
                 console.log(error);

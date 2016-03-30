@@ -20,11 +20,26 @@
         "id": "C0J5U8F99"
     },
     {
+        "name": "1dv023-serverutv",
+        "courseCode": "1dv023",
+        "id": "C0J15C9B6"
+    },
+    {
+        "name": "1dv024-oop",
+        "courseCode": "1dv024",
+        "id": "C0K4GF1K2"
+    },
+    {
         "name": "time-warriors",
         "courseCode": "???",
         "id": "G0JTV0Z2A",
-        "todayStartTime": "12:00",
+        "lectureRoom": "Ny106K",
+        "todayStartTime": "06:00",
         "todayEndTime": "20:00",
-        "lampID": "2"
+        "lampIDs": [
+            {
+                "lampId": "2"
+            }
+        ]
     }
 ]
