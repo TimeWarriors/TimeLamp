@@ -1,0 +1,192 @@
+html{
+}
+
+.section {
+    background: initial;
+    padding: 20px 20px;
+}
+
+.myHighlight{
+    background-color: #E3E4E6 !important;
+}
+
+[v-cloak] {
+    display: none;
+}
+
+/**
+ * header
+ */
+
+.header{
+    background-color: #FFF500;
+    box-shadow: 0 1px 3px rgba(0,0,0, 0.12), 0 1px 2px rgba(0,0,0, 0.24);
+}
+
+/**
+ * modal View
+ */
+
+.modalBox{
+    z-index: 1;
+}
+
+.modalHeight{
+    min-width: 40vw;
+    min-height: 24vh;
+}
+
+/**
+ * new message view
+ *
+ */
+
+#listView{
+    margin-top: 16px;
+}
+
+#listView li{
+    background-color: white;
+}
+
+#listView button{
+    line-height: 0px;
+}
+
+/* always present */
+.expandheight-transition {
+  transition: all .3s ease;
+
+  padding: 8px 0px;
+  background-color: #eee;
+  overflow: hidden;
+}
+
+.expandheight-enter, .expandheight-leave {
+  height: 0;
+  padding: 0px 0px;
+  opacity: 0;
+}
+
+.warningLabel{
+    border-top: 1px solid #ED6C63;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+.questionLabel{
+    border-top: 1px solid #42AFE3;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+}
+
+/**
+ * menu view
+ */
+
+.closeListFont{
+    cursor: default;
+    font-size: 30px !important;
+    padding-top: 10px;
+    /*padding-left: 16px;*/
+    color: gray;
+
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.openMenu{
+    position: absolute;;
+    top: 0px;
+    left: 16px;
+    z-index: 2;
+}
+
+.listWrap{
+    position: absolute;
+    z-index: 3;
+    top: 0;
+    left: 0;
+    width: 30vw;
+    height: 100vh;
+}
+
+.expand-transition {
+    transition: all .2s ease-in-out;
+    width: 30vw;
+    min-width: 300px;
+    padding-right: 8px;
+    background-color: #FFFFFF;
+    overflow: hidden;
+}
+
+.expand-enter, .expand-leave {
+  left: -30vw;
+  padding: 0 10px;
+}
+
+.list ul{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    background-color: initial;
+    overflow: scroll;
+    overflow-x: hidden;
+    max-height: 86vh;
+}
+
+.list li{
+    background-color: initial;
+    line-height: 18px;
+    overflow: auto;
+    padding-top: 6px;
+    padding-bottom: 6px;
+    padding-left: 16px;
+    font-size: 1.1em;
+    border-radius: 4px;
+}
+
+.list li:hover{
+    background-color: #E2E2E2;
+}
+
+.oldMessMenuInfoWrap {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    width: 100%;
+    float: left;
+}
+
+#list{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 5vw;
+    height: 100vh;
+    padding-left: 16px;
+    padding-right: 16px;
+}
+
+.list ul::-webkit-scrollbar {
+    display: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+#closeList{
+    border-bottom: 1px solid lightgray;
+    padding-left: 16px;
+    -webkit-touch-callout: none;
+    -webkit-user-select: none;
+    -khtml-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
